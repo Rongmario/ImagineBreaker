@@ -27,19 +27,7 @@ public final class ImagineBreaker {
             long reflectionData$exports$address = unsafe.objectFieldOffset(module$ReflectionData, "exports");
             // Retrieve ReflectionData::exports map
             Object exports = unsafe.getReference(module$ReflectionData, reflectionData$exports$address);
-            Method addExportsToAll0 = Module.class.getDeclaredMethod("addExportsToAll0", Module.class, String.class);
-            addExportsToAll0.setAccessible(true);
-            Method weakKeyMap$computeIfAbsent = Class.forName("java.lang.WeakPairMap").getMethod("computeIfAbsent", Object.class, Object.class, BiFunction.class);
-            weakKeyMap$computeIfAbsent.setAccessible(true);
-            for (String packageString : javaBaseModule.getPackages()) {
-                // Add it natively
-                addExportsToAll0.invoke(null, javaBaseModule, packageString);
-                // Add it to ReflectionData
-                @SuppressWarnings("unchecked")
-                Map<String, Boolean> map = (Map<String, Boolean>) weakKeyMap$computeIfAbsent.invoke(exports, javaBaseModule, everyoneModule,
-                        ((BiFunction<Object, Object, Object>) (k, v) -> new ConcurrentHashMap<>()));
-                map.put(packageString, true);
-            }
+            internal$openModules(javaBaseModule, everyoneModule, exports);
         } catch (Throwable t) {
             throw new RuntimeException(t);
         }
@@ -64,26 +52,31 @@ public final class ImagineBreaker {
                     everyoneModule = (Module) field.get(null);
                 }
             }
+            // Retrieve ReflectionData::exports map
+            Field reflectionData$exports = Class.forName("java.lang.Module$ReflectionData").getDeclaredField("exports");
+            reflectionData$exports.setAccessible(true);
+            Object exports = reflectionData$exports.get(null);
             if (everyoneModule != null) {
-                Method addExportsToAll0 = Module.class.getDeclaredMethod("addExportsToAll0", Module.class, String.class);
-                addExportsToAll0.setAccessible(true);
-                Field reflectionData$exports = Class.forName("java.lang.Module$ReflectionData").getDeclaredField("exports");
-                reflectionData$exports.setAccessible(true);
-                Object exports = reflectionData$exports.get(null);
-                Method weakKeyMap$computeIfAbsent = Class.forName("java.lang.WeakPairMap").getMethod("computeIfAbsent", Object.class, Object.class, BiFunction.class);
-                weakKeyMap$computeIfAbsent.setAccessible(true);
-                for (String packageString : javaBaseModule.getPackages()) {
-                    // Add it natively
-                    addExportsToAll0.invoke(null, javaBaseModule, packageString);
-                    // Add it to ReflectionData
-                    @SuppressWarnings("unchecked")
-                    Map<String, Boolean> map = (Map<String, Boolean>) weakKeyMap$computeIfAbsent.invoke(exports, javaBaseModule, everyoneModule,
-                            ((BiFunction<Object, Object, Object>) (k, v) -> new ConcurrentHashMap<>()));
-                    map.put(packageString, true);
-                }
+                internal$openModules(javaBaseModule, everyoneModule, exports);
             }
         } catch (Throwable t) {
             throw new RuntimeException(t);
+        }
+    }
+
+    private static void internal$openModules(Module javaBaseModule, Module everyoneModule, Object exports) throws ReflectiveOperationException {
+        Method addExportsToAll0 = Module.class.getDeclaredMethod("addExportsToAll0", Module.class, String.class);
+        addExportsToAll0.setAccessible(true);
+        Method weakKeyMap$computeIfAbsent = Class.forName("java.lang.WeakPairMap").getMethod("computeIfAbsent", Object.class, Object.class, BiFunction.class);
+        weakKeyMap$computeIfAbsent.setAccessible(true);
+        for (String packageString : javaBaseModule.getPackages()) {
+            // Add it natively
+            addExportsToAll0.invoke(null, javaBaseModule, packageString);
+            // Add it to ReflectionData
+            @SuppressWarnings("unchecked")
+            Map<String, Boolean> map = (Map<String, Boolean>) weakKeyMap$computeIfAbsent.invoke(exports, javaBaseModule, everyoneModule,
+                    ((BiFunction<Object, Object, Object>) (k, v) -> new ConcurrentHashMap<>()));
+            map.put(packageString, true);
         }
     }
 

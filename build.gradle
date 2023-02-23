@@ -4,7 +4,7 @@ plugins {
 }
 
 group 'zone.rong'
-version '1.0-SNAPSHOT'
+version '1.0'
 
 tasks.withType(JavaExec) {
     jvmArgs '--add-opens=java.base/jdk.internal.misc=ALL-UNNAMED'

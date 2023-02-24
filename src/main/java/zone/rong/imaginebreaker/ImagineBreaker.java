@@ -44,8 +44,8 @@ public final class ImagineBreaker {
      * This is the slower way to remove all reflection filters. Allowing full Reflection access.
      * Make sure `--add-opens=java.base/jdk.lang=ALL-UNNAMED, --add-opens=java.base/jdk.internal.reflect=ALL-UNNAMED` is added to jvm and compiler args.
      */
-    public static void removeAllReflectionFilters() {
-
+    public static void removeAllReflectionFiltersReflectively() {
+        ReflectionContainer.internal$removeAllReflectionFiltersReflectively();
     }
 
     static void internal$openModules(Module javaBaseModule, Module everyoneModule, Object exports) throws ReflectiveOperationException {

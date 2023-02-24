@@ -28,4 +28,6 @@ Supports:
    - `sun.misc.Unsafe`
 
 
+Coming in 2.0: Native way to break down JPMS, this way will bypass the need for having to include JVM Arguments.
+
 Namesake: [Toaru Majutsu no Index](https://en.wikipedia.org/wiki/A_Certain_Magical_Index)

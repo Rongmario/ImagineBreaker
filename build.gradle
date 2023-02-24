@@ -8,10 +8,11 @@ version '1.0'
 
 tasks.withType(JavaExec) {
     jvmArgs '--add-opens=java.base/jdk.internal.misc=ALL-UNNAMED'
+    jvmArgs '--add-opens=java.base/jdk.internal.reflect=ALL-UNNAMED'
 }
 
 tasks.withType(JavaCompile) {
-    options.compilerArgs += ["--add-exports=java.base/jdk.internal.misc=ALL-UNNAMED"]
+    options.compilerArgs += ["--add-exports=java.base/jdk.internal.misc=ALL-UNNAMED", '--add-exports=java.base/jdk.internal.reflect=ALL-UNNAMED']
 }
 
 idea.project.settings.compiler.javac.javacAdditionalOptions = compileJava.options.compilerArgs.join(' ')
@@ -30,5 +31,6 @@ test {
     forkEvery 1
     // TODO: separate args for separate tests(?)
     jvmArgs '--add-opens=java.base/jdk.internal.misc=ALL-UNNAMED'
+    jvmArgs '--add-opens=java.base/jdk.internal.reflect=ALL-UNNAMED'
     jvmArgs '--add-opens=java.base/java.lang=ALL-UNNAMED'
 }

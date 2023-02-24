@@ -1,12 +1,16 @@
 package zone.rong.imaginebreaker;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiFunction;
 
 public final class ImagineBreaker {
+
+    public static Optional<Module> findBootModule(String moduleName) {
+        return ModuleLayer.boot().findModule(moduleName);
+    }
 
     /**
      * Opens all modules linked under java.base Module.
@@ -14,23 +18,7 @@ public final class ImagineBreaker {
      * Make sure `--add-opens=java.base/jdk.internal.misc=ALL-UNNAMED` is added to jvm and compiler args.
      */
     public static void openAllBaseModulesUnsafely() {
-        try {
-            // Get java.base as a Module
-            final Module javaBaseModule = ModuleLayer.boot().findModule("java.base").orElseThrow(RuntimeException::new);
-            // jdk.internal.misc.Unsafe is needed here
-            jdk.internal.misc.Unsafe unsafe = jdk.internal.misc.Unsafe.getUnsafe();
-            // Grab address to Field
-            long everyoneModule$Address = unsafe.objectFieldOffset(Module.class, "EVERYONE_MODULE");
-            // Retrieve Field's value, EVERYONE_MODULE as a Module
-            Module everyoneModule = (Module) unsafe.getReference(Module.class, everyoneModule$Address);
-            Class<?> module$ReflectionData = Class.forName("java.lang.Module$ReflectionData");
-            long reflectionData$exports$address = unsafe.objectFieldOffset(module$ReflectionData, "exports");
-            // Retrieve ReflectionData::exports map
-            Object exports = unsafe.getReference(module$ReflectionData, reflectionData$exports$address);
-            internal$openModules(javaBaseModule, everyoneModule, exports);
-        } catch (Throwable t) {
-            throw new RuntimeException(t);
-        }
+        UnsafeContainer.internal$openAllBaseModulesUnsafely();
     }
 
     /**
@@ -39,32 +27,28 @@ public final class ImagineBreaker {
      * Make sure `--add-opens=java.base/jdk.lang=ALL-UNNAMED` is added to jvm and compiler args.
      */
     public static void openAllBaseModulesReflectively() {
-        try {
-            // Get java.base as a Module
-            final Module javaBaseModule = ModuleLayer.boot().findModule("java.base").orElseThrow(RuntimeException::new);
-            // Roundabout way as Module.class is protected with reflection filters
-            Method getDeclaredFields0 = Class.class.getDeclaredMethod("getDeclaredFields0", boolean.class);
-            getDeclaredFields0.setAccessible(true);
-            Module everyoneModule = null;
-            for (Field field : (Field[]) getDeclaredFields0.invoke(Module.class, false)) {
-                if ("EVERYONE_MODULE".equals(field.getName())) {
-                    field.setAccessible(true);
-                    everyoneModule = (Module) field.get(null);
-                }
-            }
-            // Retrieve ReflectionData::exports map
-            Field reflectionData$exports = Class.forName("java.lang.Module$ReflectionData").getDeclaredField("exports");
-            reflectionData$exports.setAccessible(true);
-            Object exports = reflectionData$exports.get(null);
-            if (everyoneModule != null) {
-                internal$openModules(javaBaseModule, everyoneModule, exports);
-            }
-        } catch (Throwable t) {
-            throw new RuntimeException(t);
-        }
+        ReflectionContainer.internal$openAllBaseModulesReflectively();
     }
 
-    private static void internal$openModules(Module javaBaseModule, Module everyoneModule, Object exports) throws ReflectiveOperationException {
+    /**
+     * Removes all jdk.internal.reflect.Reflection field and method filters
+     * This is the fastest way to remove all reflection filters. Allowing full Reflection access.
+     * Make sure `--add-opens=java.base/jdk.internal.misc=ALL-UNNAMED, --add-opens=java.base/jdk.internal.reflect=ALL-UNNAMED` is added to jvm and compiler args.
+     */
+    public static void removeAllReflectionFiltersUnsafely() {
+        UnsafeContainer.internal$removeAllReflectionFiltersUnsafely();
+    }
+
+    /**
+     * Removes all jdk.internal.reflect.Reflection field and method filters
+     * This is the slower way to remove all reflection filters. Allowing full Reflection access.
+     * Make sure `--add-opens=java.base/jdk.lang=ALL-UNNAMED, --add-opens=java.base/jdk.internal.reflect=ALL-UNNAMED` is added to jvm and compiler args.
+     */
+    public static void removeAllReflectionFilters() {
+
+    }
+
+    static void internal$openModules(Module javaBaseModule, Module everyoneModule, Object exports) throws ReflectiveOperationException {
         Method addExportsToAll0 = Module.class.getDeclaredMethod("addExportsToAll0", Module.class, String.class);
         addExportsToAll0.setAccessible(true);
         Method weakKeyMap$computeIfAbsent = Class.forName("java.lang.WeakPairMap").getMethod("computeIfAbsent", Object.class, Object.class, BiFunction.class);

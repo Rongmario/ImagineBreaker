@@ -41,6 +41,7 @@ class UnsafeContainer {
         long methodFilterMap$Address = unsafe.objectFieldOffset(Reflection.class, "methodFilterMap");
         @SuppressWarnings("unchecked")
         Map<Class<?>, Object> fieldFilterMap = (Map<Class<?>, Object>) unsafe.getAndSetReference(Reflection.class, fieldFilterMap$Address, null);
+        @SuppressWarnings("unchecked")
         Map<Class<?>, Object> methodFilterMap = (Map<Class<?>, Object>) unsafe.getAndSetReference(Reflection.class, methodFilterMap$Address, null);
         long reflectionData$Address = unsafe.objectFieldOffset(Class.class, "reflectionData");
         if (fieldFilterMap != null) {

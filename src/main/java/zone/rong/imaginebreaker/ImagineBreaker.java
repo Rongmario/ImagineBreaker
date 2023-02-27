@@ -12,6 +12,10 @@ public final class ImagineBreaker {
         return ModuleLayer.boot().findModule(moduleName);
     }
 
+    private static Module unsafeFindBootModule(String moduleName) {
+        return ModuleLayer.boot().findModule(moduleName).get();
+    }
+
     /**
      * Opens all modules linked under java.base Module.
      * This is the fastest way to open all modules. But by using jdk.internal.misc.Unsafe.

@@ -73,5 +73,5 @@ jobs:
       - name: Upload Artifact
         uses: actions/upload-artifact@v3
         with:
-          name: ImagineBreaker
+          name: ImagineBreaker-${{ matrix.os }}
           path: build/libs/

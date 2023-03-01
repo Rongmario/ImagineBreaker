@@ -1,28 +1,77 @@
 name: Build
 
-on:
-  push:
-    tags:
-      - '*'
+on: [workflow_dispatch, push]
+
+defaults:
+  run:
+    shell: bash
 
 jobs:
-  build-gradle-project:
-    runs-on: ubuntu-latest
+  compile_and_link:
+    name: Compile and Link for ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+
     steps:
-      - name: Checkout Sources
+      - name: Checkout Repository
         uses: actions/checkout@v2
 
-      - name: Set up JDK 17
-        uses: actions/setup-java@v3.10.0
+      - name: Setup Java
+        id: setup-java
+        uses: actions/setup-java@v3
         with:
-          java-version: '17'
           distribution: 'temurin'
+          java-version: '17'
+          cache: 'gradle'
 
-      - name: Fix Gradle Permission
-        run: chmod +x ./gradlew
+      - name: Make Directory (Linux)
+        if: ${{ matrix.os == 'ubuntu-latest' }}
+        run: mkdir linux && mkdir src/main/resources
+
+      - name: Make Directory (MacOS)
+        if: ${{ matrix.os == 'macos-latest' }}
+        run: mkdir macos && mkdir src/main/resources
+
+      - name: Make Directory (Windows)
+        if: ${{ matrix.os == 'windows-latest' }}
+        run: mkdir windows & mkdir src/main/resources
+
+      - name: Compile (Linux)
+        if: ${{ matrix.os == 'ubuntu-latest' }}
+        run: g++ -c -fPIC -I$JAVA_HOME/include -I$JAVA_HOME/include/linux src/main/cpp/zone_rong_imaginebreaker_NativeImagineBreaker.cpp -o linux/zone_rong_imaginebreaker_NativeImagineBreaker.o
+
+      - name: Compile (MacOS)
+        if: ${{ matrix.os == 'macos-latest' }}
+        run: g++ -c -fPIC -I$JAVA_HOME/include -I$JAVA_HOME/include/darwin src/main/cpp/zone_rong_imaginebreaker_NativeImagineBreaker.cpp -o macos/zone_rong_imaginebreaker_NativeImagineBreaker.o
+
+      - name: Compile (Windows)
+        if: ${{ matrix.os == 'windows-latest' }}
+        run: g++ -c -I$JAVA_HOME/include -I$JAVA_HOME/include/win32 src/main/cpp/zone_rong_imaginebreaker_NativeImagineBreaker.cpp -o windows/zone_rong_imaginebreaker_NativeImagineBreaker.o
+
+      - name: Linking (Linux)
+        if: ${{ matrix.os == 'ubuntu-latest' }}
+        run: g++ -shared -fPIC -o src/main/resources/imaginebreaker.so linux/zone_rong_imaginebreaker_NativeImagineBreaker.o -lc
+
+      - name: Linking (MacOS)
+        if: ${{ matrix.os == 'macos-latest' }}
+        run: g++ -dynamiclib -o src/main/resources/imaginebreaker.dylib macos/zone_rong_imaginebreaker_NativeImagineBreaker.o -lc
+
+      - name: Linking (Windows)
+        if: ${{ matrix.os == 'windows-latest' }}
+        run: g++ -shared -o src/main/resources/imaginebreaker.dll windows/zone_rong_imaginebreaker_NativeImagineBreaker.o -Wl,--add-stdcall-alias
 
       - name: Setup Gradle
         uses: gradle/gradle-build-action@v2
 
-      - name: Build with Gradle Wrapper
-        run: ./gradlew build
+      - name: Gradle Build (Skip Tests)
+        run: ./gradlew build -x test
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: ImagineBreaker
+          path: build/libs/

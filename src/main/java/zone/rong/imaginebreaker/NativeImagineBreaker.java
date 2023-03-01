@@ -4,6 +4,10 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiFunction;
 
+/**
+ * Before calling any native methods, you must load the library, there are numerous ways of doing so.
+ * The native shared libraries are packed in the natives/ folder.
+ */
 public class NativeImagineBreaker {
 
     public static native void openBaseModules();

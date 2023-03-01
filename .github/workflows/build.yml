@@ -21,7 +21,7 @@ jobs:
           java-version: '17'
           cache: 'gradle'
       - name: Make Directory
-        run: mkdir windows
+        run: mkdir windows & mkdir output_natives
       - name: Compile
         run: g++ -c -I$JAVA_HOME/include -I$JAVA_HOME/include/win32 src/main/cpp/zone_rong_imaginebreaker_NativeImagineBreaker.cpp -o windows/zone_rong_imaginebreaker_NativeImagineBreaker.o
       - name: Linking
@@ -45,7 +45,7 @@ jobs:
           java-version: '17'
           cache: 'gradle'
       - name: Make Directory
-        run: mkdir linux
+        run: mkdir linux && mkdir output_natives
       - name: Compile
         run: g++ -c -fPIC -I$JAVA_HOME/include -I$JAVA_HOME/include/linux src/main/cpp/zone_rong_imaginebreaker_NativeImagineBreaker.cpp -o linux/zone_rong_imaginebreaker_NativeImagineBreaker.o
       - name: Linking
@@ -69,7 +69,7 @@ jobs:
           java-version: '17'
           cache: 'gradle'
       - name: Make Directory
-        run: mkdir macos
+        run: mkdir macos && mkdir output_natives
       - name: Compile
         run: g++ -c -fPIC -I$JAVA_HOME/include -I$JAVA_HOME/include/darwin src/main/cpp/zone_rong_imaginebreaker_NativeImagineBreaker.cpp -o macos/zone_rong_imaginebreaker_NativeImagineBreaker.o
       - name: Linking

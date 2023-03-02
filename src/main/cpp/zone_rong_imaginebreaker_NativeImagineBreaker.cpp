@@ -53,7 +53,7 @@ jobject everyoneModule, jobject computeIfAbsentFunction) {
  * Method:    removeFieldReflectionFilters
  * Signature: ()Ljava/lang/Object;
  */
-JNIEXPORT jobject JNICALL Java_zone_rong_imaginebreaker_NativeImagineBreaker_removeFieldReflectionFilters(JNIEnv *, jclass) {
+JNIEXPORT jobject JNICALL Java_zone_rong_imaginebreaker_NativeImagineBreaker_removeFieldReflectionFilters(JNIEnv* env, jclass thisClass) {
    std::cout << "[ImagineBreaker] Removing field reflection filters natively..." << std::endl;
    jclass reflectionClass = env->FindClass("jdk/internal/reflect/Reflection");
    jfieldID fieldFilterMapField = env->GetStaticFieldID(reflectionClass, "fieldFilterMap", "Ljava/util/Map;");
@@ -67,7 +67,7 @@ JNIEXPORT jobject JNICALL Java_zone_rong_imaginebreaker_NativeImagineBreaker_rem
  * Method:    removeMethodReflectionFilters
  * Signature: ()Ljava/lang/Object;
  */
-JNIEXPORT jobject JNICALL Java_zone_rong_imaginebreaker_NativeImagineBreaker_removeMethodReflectionFilters(JNIEnv *, jclass) {
+JNIEXPORT jobject JNICALL Java_zone_rong_imaginebreaker_NativeImagineBreaker_removeMethodReflectionFilters(JNIEnv* env, jclass thisClass) {
     std::cout << "[ImagineBreaker] Removing method reflection filters natively..." << std::endl;
     jclass reflectionClass = env->FindClass("jdk/internal/reflect/Reflection");
     jfieldID methodFilterMapField = env->GetStaticFieldID(reflectionClass, "methodFilterMap", "Ljava/util/Map;");
@@ -81,7 +81,7 @@ JNIEXPORT jobject JNICALL Java_zone_rong_imaginebreaker_NativeImagineBreaker_rem
  * Method:    clearReflectionData
  * Signature: (Ljava/lang/Class;)V
  */
-JNIEXPORT void JNICALL Java_zone_rong_imaginebreaker_NativeImagineBreaker_clearReflectionData(JNIEnv *, jclass, jclass clazz) {
+JNIEXPORT void JNICALL Java_zone_rong_imaginebreaker_NativeImagineBreaker_clearReflectionData(JNIEnv* env, jclass thisClass, jclass clazz) {
     jfieldID reflectionDataField = env->GetFieldID(clazz, "reflectionData", "Ljava/lang/ref/SoftReference;");
     env->SetObjectField(clazz, reflectionDataField, NULL);
 }

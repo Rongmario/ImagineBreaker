@@ -81,8 +81,8 @@ JNIEXPORT jobject JNICALL Java_zone_rong_imaginebreaker_NativeImagineBreaker_rem
  * Method:    clearReflectionData
  * Signature: (Ljava/lang/Class;)V
  */
-JNIEXPORT void JNICALL Java_zone_rong_imaginebreaker_NativeImagineBreaker_clearReflectionData(JNIEnv* env, jclass thisClass, jclass clazz) {
-    jfieldID reflectionDataField = env->GetFieldID(clazz, "reflectionData", "Ljava/lang/ref/SoftReference;");
+JNIEXPORT void JNICALL Java_zone_rong_imaginebreaker_NativeImagineBreaker_clearReflectionData(JNIEnv* env, jclass thisClass, jclass classClazz, jclass clazz) {
+    jfieldID reflectionDataField = env->GetFieldID(classClazz, "reflectionData", "Ljava/lang/ref/SoftReference;");
     env->SetObjectField(clazz, reflectionDataField, NULL);
 }
 

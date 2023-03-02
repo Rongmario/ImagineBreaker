@@ -20,7 +20,7 @@ public class NativeImagineBreaker {
 
     private static native Object removeMethodReflectionFilters();
 
-    private static native void clearReflectionData(Class<?> clazz);
+    private static native void clearReflectionData(Class<?> classClazz, Class<?> clazz);
 
     public static void removeAllReflectionFilters() {
         @SuppressWarnings("unchecked")
@@ -30,13 +30,13 @@ public class NativeImagineBreaker {
         if (fieldFilterMap != null) {
             // Go through every class and clear all of their ReflectionData caches
             for (Class<?> clazz : fieldFilterMap.keySet()) {
-                clearReflectionData(clazz);
+                clearReflectionData(Class.class, clazz);
             }
         }
         if (methodFilterMap != null) {
             // Go through every class and clear all of their ReflectionData caches
             for (Class<?> clazz : methodFilterMap.keySet()) {
-                clearReflectionData(clazz);
+                clearReflectionData(Class.class, clazz);
             }
         }
     }

@@ -50,10 +50,10 @@ JNIEXPORT jobject JNICALL Java_zone_rong_imaginebreaker_NativeImagineBreaker_rem
 /*
  * Class:     zone_rong_imaginebreaker_NativeImagineBreaker
  * Method:    clearReflectionData
- * Signature: (Ljava/lang/Class;)V
+ * Signature: (Ljava/lang/Class;Ljava/lang/Class;)V
  */
 JNIEXPORT void JNICALL Java_zone_rong_imaginebreaker_NativeImagineBreaker_clearReflectionData
-  (JNIEnv *, jclass, jclass);
+  (JNIEnv *, jclass, jclass, jclass);
 
 #ifdef __cplusplus
 }

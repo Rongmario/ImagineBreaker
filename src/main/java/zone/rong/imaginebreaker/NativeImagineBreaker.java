@@ -1,5 +1,7 @@
 package zone.rong.imaginebreaker;
 
+import sun.misc.Unsafe;
+
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiFunction;
@@ -23,6 +25,9 @@ public class NativeImagineBreaker {
     private static native void clearReflectionData(Class<?> classClazz, Class<?> clazz);
 
     public static void removeAllReflectionFilters() {
+        try {
+            Unsafe.getUnsafe(); // Initialize sun.misc.Unsafe first (TODO: find out why this is needed, without this, NoClassDefFoundError is fired)
+        } catch (SecurityException ignored) { }
         @SuppressWarnings("unchecked")
         Map<Class<?>, Object> fieldFilterMap = (Map<Class<?>, Object>) removeFieldReflectionFilters();
         @SuppressWarnings("unchecked")

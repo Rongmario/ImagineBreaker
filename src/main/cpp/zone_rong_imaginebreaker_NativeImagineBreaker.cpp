@@ -7,7 +7,7 @@
  * Signature: ()V
  */
 JNIEXPORT void JNICALL Java_zone_rong_imaginebreaker_NativeImagineBreaker_openBaseModules(JNIEnv* env, jclass thisClass) {
-    std::cout << "Opening modules natively..." << std::endl;
+    std::cout << "[ImagineBreaker] Opening modules natively..." << std::endl;
 
     jclass imagineBreakerClass = env->FindClass("zone/rong/imaginebreaker/ImagineBreaker");
     jmethodID findBootModule = env->GetStaticMethodID(imagineBreakerClass, "unsafeFindBootModule", "(Ljava/lang/String;)Ljava/lang/Module;");
@@ -23,24 +23,6 @@ JNIEXPORT void JNICALL Java_zone_rong_imaginebreaker_NativeImagineBreaker_openBa
 
     jmethodID internal$openModules = env->GetStaticMethodID(thisClass, "internal$openModules", "(Ljava/lang/Module;Ljava/lang/Module;Ljava/lang/Object;)V");
     env->CallStaticVoidMethod(thisClass, internal$openModules, javaBaseModule, everyoneModule, exports);
-}
-
-
-/*
- * Class:     zone_rong_imaginebreaker_NativeImagineBreaker
- * Method:    removeAllReflectionFilters
- * Signature: ()V
- */
-JNIEXPORT void JNICALL Java_zone_rong_imaginebreaker_NativeImagineBreaker_removeAllReflectionFilters(JNIEnv* env, jclass thisClass) {
-    std::cout << "Removing reflection filters natively..." << std::endl;
-
-    jclass reflectionClass = env->FindClass("jdk/internal/reflect/Reflection");
-
-    jfieldID fieldFilterMapField = env->GetStaticFieldID(reflectionClass, "fieldFilterMap", "Ljava/util/Map;");
-    jfieldID methodFilterMapField = env->GetStaticFieldID(reflectionClass, "methodFilterMap", "Ljava/util/Map;");
-
-    env->SetStaticObjectField(reflectionClass, fieldFilterMapField, NULL);
-    env->SetStaticObjectField(reflectionClass, methodFilterMapField, NULL);
 }
 
 /*
@@ -64,5 +46,43 @@ jobject everyoneModule, jobject computeIfAbsentFunction) {
     jclass weakPairMapClass = env->FindClass("java/lang/WeakPairMap");
     jmethodID computeIfAbsent = env->GetMethodID(weakPairMapClass, "computeIfAbsent", "(Ljava/lang/Object;Ljava/lang/Object;Ljava/util/function/BiFunction;)Ljava/lang/Object;");
     return env->CallObjectMethod(exports, computeIfAbsent, javaBaseModule, everyoneModule, computeIfAbsentFunction);
+}
+
+/*
+ * Class:     zone_rong_imaginebreaker_NativeImagineBreaker
+ * Method:    removeFieldReflectionFilters
+ * Signature: ()Ljava/lang/Object;
+ */
+JNIEXPORT jobject JNICALL Java_zone_rong_imaginebreaker_NativeImagineBreaker_removeFieldReflectionFilters(JNIEnv *, jclass) {
+   std::cout << "[ImagineBreaker] Removing field reflection filters natively..." << std::endl;
+   jclass reflectionClass = env->FindClass("jdk/internal/reflect/Reflection");
+   jfieldID fieldFilterMapField = env->GetStaticFieldID(reflectionClass, "fieldFilterMap", "Ljava/util/Map;");
+   jobject fieldFilterMap = env->GetStaticObjectField(reflectionClass, fieldFilterMapField);
+   env->SetStaticObjectField(reflectionClass, fieldFilterMapField, NULL);
+   return fieldFilterMap;
+}
+
+/*
+ * Class:     zone_rong_imaginebreaker_NativeImagineBreaker
+ * Method:    removeMethodReflectionFilters
+ * Signature: ()Ljava/lang/Object;
+ */
+JNIEXPORT jobject JNICALL Java_zone_rong_imaginebreaker_NativeImagineBreaker_removeMethodReflectionFilters(JNIEnv *, jclass) {
+    std::cout << "[ImagineBreaker] Removing method reflection filters natively..." << std::endl;
+    jclass reflectionClass = env->FindClass("jdk/internal/reflect/Reflection");
+    jfieldID methodFilterMapField = env->GetStaticFieldID(reflectionClass, "methodFilterMap", "Ljava/util/Map;");
+    jobject methodFilterMap = env->GetStaticObjectField(reflectionClass, methodFilterMapField);
+    env->SetStaticObjectField(reflectionClass, methodFilterMapField, NULL);
+    return methodFilterMap;
+}
+
+/*
+ * Class:     zone_rong_imaginebreaker_NativeImagineBreaker
+ * Method:    clearReflectionData
+ * Signature: (Ljava/lang/Class;)V
+ */
+JNIEXPORT void JNICALL Java_zone_rong_imaginebreaker_NativeImagineBreaker_clearReflectionData(JNIEnv *, jclass, jclass clazz) {
+    jfieldID reflectionDataField = env->GetFieldID(clazz, "reflectionData", "Ljava/lang/ref/SoftReference;");
+    env->SetObjectField(clazz, reflectionDataField, NULL);
 }
 

@@ -12,11 +12,34 @@ public class NativeImagineBreaker {
 
     public static native void openBaseModules();
 
-    public static native void removeAllReflectionFilters();
-
     private static native void addExportsToAll0(Module module, String exports);
 
     private static native Object weakPairMap_computeIfAbsent(Object exports, Module javaBaseModule, Module everyoneModule, Object computeIfAbsentFunction);
+
+    private static native Object removeFieldReflectionFilters();
+
+    private static native Object removeMethodReflectionFilters();
+
+    private static native void clearReflectionData(Class<?> clazz);
+
+    public static void removeAllReflectionFilters() {
+        @SuppressWarnings("unchecked")
+        Map<Class<?>, Object> fieldFilterMap = (Map<Class<?>, Object>) removeFieldReflectionFilters();
+        @SuppressWarnings("unchecked")
+        Map<Class<?>, Object> methodFilterMap = (Map<Class<?>, Object>) removeMethodReflectionFilters();
+        if (fieldFilterMap != null) {
+            // Go through every class and clear all of their ReflectionData caches
+            for (Class<?> clazz : fieldFilterMap.keySet()) {
+                clearReflectionData(clazz);
+            }
+        }
+        if (methodFilterMap != null) {
+            // Go through every class and clear all of their ReflectionData caches
+            for (Class<?> clazz : methodFilterMap.keySet()) {
+                clearReflectionData(clazz);
+            }
+        }
+    }
 
     private static void internal$openModules(Module javaBaseModule, Module everyoneModule, Object exports) {
         for (String packageString : javaBaseModule.getPackages()) {

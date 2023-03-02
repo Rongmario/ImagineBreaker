@@ -2,12 +2,9 @@
 
 # Imagine Breaker [幻想殺し]
 
-<br>
 
-#### *I will destroy that illusion of yours.*
+### *I will destroy that illusion of yours.*
 
-<br>
-<br>
 Supports:
 
 1. Breaking down the Java Platform Module System (JPMS) to allow Reflection into any base or requested modules
@@ -26,8 +23,11 @@ Supports:
    - `java.lang.invoke.MethodHandles$Lookup`
    - `java.lang.reflect.AccessibleObject`
    - `sun.misc.Unsafe`
+   
+All of the above is achieved with 3 different ways:
 
-
-Coming in 2.0: Native way to break down JPMS, this way will bypass the need for having to include JVM Arguments.
+1. Reflection
+2. Unsafe
+3. JNI
 
 Namesake: [Toaru Majutsu no Index](https://en.wikipedia.org/wiki/A_Certain_Magical_Index)

@@ -11,6 +11,8 @@ jobs:
     name: Compile and Link for Windows
     runs-on: windows-latest
     steps:
+      - name: msvc
+        uses: ilammy/msvc-dev-cmd@v1
       - name: Checkout Repository
         uses: actions/checkout@v2
 
@@ -26,11 +28,7 @@ jobs:
         run: mkdir windows & mkdir output_natives
 
       - name: Compile
-        run: g++ -c -I$JAVA_HOME/include -I$JAVA_HOME/include/win32 src/main/cpp/zone_rong_imaginebreaker_NativeImagineBreaker.cpp -o windows/zone_rong_imaginebreaker_NativeImagineBreaker.o
-
-      - name: Linking
-        run: g++ -shared -o output_natives/imaginebreaker.dll windows/zone_rong_imaginebreaker_NativeImagineBreaker.o -Wl,--add-stdcall-alias
-
+        run: cl.exe -LD -I$JAVA_HOME/include -I$JAVA_HOME/include/win32 src/main/cpp/zone_rong_imaginebreaker_NativeImagineBreaker.cpp -link -out:output_natives/imaginebreaker.dll
       - name: Upload Artifact
         uses: actions/upload-artifact@v3
         with:

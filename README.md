@@ -3,7 +3,9 @@
 # Imagine Breaker [幻想殺し]
 
 
-### *I will destroy that illusion of yours.*
+### *I will destroy that illusion of yours.* 
+
+<sub>(Disclaimer: use with care, I'll not be held responsible for your JVM burning up in flames)</sub>
 
 Supports:
 
@@ -26,8 +28,8 @@ Supports:
    
 All of the above is achieved with 3 different ways:
 
-1. Reflection
-2. Unsafe
+1. Reflection (needs `--add-opens=java.base/jdk.lang=ALL-UNNAMED`)
+2. Unsafe (needs `--add-opens=java.base/jdk.internal.misc=ALL-UNNAMED`)
 3. JNI
 
 Namesake: [Toaru Majutsu no Index](https://en.wikipedia.org/wiki/A_Certain_Magical_Index)

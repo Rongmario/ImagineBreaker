@@ -94,6 +94,41 @@ jobs:
         with:
           name: resources
           path: output_natives/
+  
+  android:
+    name: Compile for Android
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Setup Java
+        id: setup-java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+          cache: 'gradle'
+
+      - name: Make Directory
+        run: mkdir toolchains
+
+      - name: Setup NDK
+        uses: ravinderjangra/android-ndk-toolchain-setup@0.2
+        with:
+          api: '21'
+          arch: 'arm64'
+          install-location: 'toolchains'
+          force: true
+  
+      - name: Compile
+        run: cd src/main/cpp && ndk-build NDK_PROJECT_PATH=. APP_BUILD_SCRIPT=Android.mk APP_PLATFORM=android-21 APP_ABI=arm64-v8a APP_STL=c++_static
+  
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: resources
+          path: libs/arm64-v8a
           
   build-jar:
     name: Compile Jar

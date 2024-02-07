@@ -32,5 +32,6 @@ test {
     // TODO: separate args for separate tests(?)
     jvmArgs '--add-opens=java.base/jdk.internal.misc=ALL-UNNAMED'
     jvmArgs '--add-opens=java.base/jdk.internal.reflect=ALL-UNNAMED'
-    jvmArgs '--add-opens=java.base/java.lang=ALL-UNNAMED'
+
+    systemProperty "java.library.path", file("${project(":imagineBreakerNatives").buildDir}/lib/main/debug").absolutePath
 }

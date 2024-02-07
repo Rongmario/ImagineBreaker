@@ -1,0 +1,31 @@
+import org.gradle.internal.jvm.Jvm
+
+plugins {
+    id 'cpp-library'
+}
+
+library {
+    binaries.configureEach { CppBinary binary ->
+        def compileTask = binary.compileTask.get()
+        compileTask.includes.from("${Jvm.current().javaHome}/include")
+
+        def osFamily = binary.targetPlatform.targetMachine.operatingSystemFamily
+        if (osFamily.macOs) {
+            compileTask.includes.from("${Jvm.current().javaHome}/include/darwin")
+        } else if (osFamily.linux) {
+            compileTask.includes.from("${Jvm.current().javaHome}/include/linux")
+        } else if (osFamily.windows) {
+            compileTask.includes.from("${Jvm.current().javaHome}/include/win32")
+        }
+
+        compileTask.source.from fileTree(dir: "src/main/c", include: "**/*.c")
+
+        def toolChain = binary.toolChain
+        if (toolChain instanceof VisualCpp) {
+            compileTask.compilerArgs.addAll(["/TC"])
+        } else if (toolChain instanceof GccCompatibleToolChain) {
+            compileTask.compilerArgs.addAll(["-x", "c", "-std=c11"])
+        }
+    }
+
+}

@@ -7,7 +7,7 @@
 
 <sub>(Disclaimer: use with care, I'll not be held responsible for your JVM burning up in flames)</sub>
 
-Supports:
+With the love of JNI, this supports:
 
 1. Breaking down the Java Platform Module System (JPMS) to allow Reflection into any base or requested modules
 2. Removal of Reflection Filters, allows retrieval of any fields/methods from classes that were previously blocked:
@@ -25,11 +25,5 @@ Supports:
    - `java.lang.invoke.MethodHandles$Lookup`
    - `java.lang.reflect.AccessibleObject`
    - `sun.misc.Unsafe`
-   
-All of the above is achieved with 3 different ways:
-
-1. Reflection (needs `--add-opens=java.base/jdk.lang=ALL-UNNAMED`)
-2. Unsafe (needs `--add-opens=java.base/jdk.internal.misc=ALL-UNNAMED`)
-3. JNI
 
 Namesake: [Toaru Majutsu no Index](https://en.wikipedia.org/wiki/A_Certain_Magical_Index)

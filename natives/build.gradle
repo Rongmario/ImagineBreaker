@@ -40,5 +40,5 @@ tasks.named('assemble').configure {
 tasks.register('moveNative', Copy) {
     from 'build/lib/main/debug'
     include '**.dll', '**.so', '**.dylib'
-    into 'build/lib'
+    into 'build/output'
 }

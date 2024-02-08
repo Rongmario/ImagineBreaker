@@ -4,7 +4,10 @@ import java.util.Map;
 
 public final class ImagineBreaker {
 
+    private static final boolean isOpenJ9;
+
     static {
+        isOpenJ9 = "Eclipse OpenJ9".equals(System.getProperty("java.vm.vendor"));
         NativeLoader.load();
     }
 
@@ -28,15 +31,19 @@ public final class ImagineBreaker {
 
     public static void removeFieldReflectionFilters() {
         var map = implRemoveFieldReflectionFilters();
-        for (var clazz : map.keySet()) {
-            implRemoveClassReflectionCacheData(clazz);
+        if (!isOpenJ9) {
+            for (var clazz : map.keySet()) {
+                implRemoveClassReflectionCacheData(clazz);
+            }
         }
     }
 
     public static void removeMethodReflectionFilters() {
         var map = implRemoveMethodReflectionFilters();
-        for (var clazz : map.keySet()) {
-            implRemoveClassReflectionCacheData(clazz);
+        if (!isOpenJ9) {
+            for (var clazz : map.keySet()) {
+                implRemoveClassReflectionCacheData(clazz);
+            }
         }
     }
 

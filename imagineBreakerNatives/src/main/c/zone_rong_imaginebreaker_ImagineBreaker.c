@@ -28,6 +28,9 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void* reserved) {
     classClass = (*env)->FindClass(env, "java/lang/Class");
     reflectionData = (*env)->GetFieldID(env, classClass, "reflectionData", "Ljava/lang/ref/SoftReference;");
 
+    (*env)->ExceptionCheck(env);
+    (*env)->ExceptionClear(env);
+
     return JNI_VERSION_1_1;
 }
 

@@ -11,4 +11,4 @@ plugins {
 
 rootProject.name = 'ImagineBreaker'
 
-include 'imagineBreakerNatives'
+include 'natives'

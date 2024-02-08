@@ -5,6 +5,9 @@ plugins {
 }
 
 library {
+
+    baseName = 'libImagineBreaker'
+
     binaries.configureEach { CppBinary binary ->
         def compileTask = binary.compileTask.get()
         compileTask.includes.from("${Jvm.current().javaHome}/include")
@@ -28,4 +31,14 @@ library {
         }
     }
 
+}
+
+tasks.named('assemble').configure {
+    finalizedBy 'moveNative'
+}
+
+tasks.register('moveNative', Copy) {
+    from 'build/lib/main/debug'
+    include '**.dll', '**.so', '**.dylib'
+    into 'build/lib'
 }

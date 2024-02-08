@@ -4,7 +4,7 @@ final class NativeLoader {
 
     public static void load() {
         try {
-            System.loadLibrary("imagineBreakerNatives");
+            System.loadLibrary("libImagineBreaker");
         } catch (Throwable t) {
             throw new RuntimeException(t);
         }

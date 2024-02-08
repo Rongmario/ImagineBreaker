@@ -33,7 +33,7 @@ test {
     jvmArgs '--add-opens=java.base/jdk.internal.misc=ALL-UNNAMED'
     jvmArgs '--add-opens=java.base/jdk.internal.reflect=ALL-UNNAMED'
 
-    systemProperty "java.library.path", file("${project(":imagineBreakerNatives").buildDir}/lib/main/debug").absolutePath
+    systemProperty "java.library.path", file("${project(":natives").buildDir}/lib/").absolutePath
 }
 
 def testVendorsAndVersions = tasks.register('testVendorsAndVersions') {
@@ -58,7 +58,7 @@ targetVendors.each { spec, info ->
                 toolchain.vendor = spec
             }
             test.useJUnitPlatform()
-            test.systemProperty "java.library.path", file("${project(":imagineBreakerNatives").buildDir}/lib/main/debug").absolutePath
+            test.systemProperty "java.library.path", file("${project(":natives").buildDir}/lib/").absolutePath
         }
         testVendorsAndVersions.configure {
             dependsOn testTask

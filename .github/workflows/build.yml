@@ -26,4 +26,6 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: native
-          path: natives/build/output
+          # path: natives/build/output
+          # TODO:
+          path: natives/build/lib/main/debug/

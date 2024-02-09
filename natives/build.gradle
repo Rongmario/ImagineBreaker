@@ -7,10 +7,7 @@ plugins {
 
 library {
 
-    def archString = System.getProperty('os.arch')
-    def archBits = archString.contains('64') ? 'x64' : 'x32'
-
-    baseName = (Os.isFamily(Os.FAMILY_WINDOWS) ? 'libImagineBreaker' : 'ImagineBreaker') + "_$archBits"
+    baseName = Os.isFamily(Os.FAMILY_WINDOWS) ? 'libImagineBreaker' : 'ImagineBreaker'
 
     binaries.configureEach { CppBinary binary ->
         def compileTask = binary.compileTask.get()
@@ -35,25 +32,13 @@ library {
         }
     }
 
-    targetMachines = [ machines.windows.x86_64, machines.macOS.x86_64, machines.linux.x86_64 ]
+    targetMachines = [
+            machines.windows.x86_64,
+            machines.windows.x86,
+            machines.macOS.x86_64,
+            machines.macOS.x86,
+            machines.linux.x86_64,
+            machines.linux.x86
+    ]
 
-}
-
-tasks.named('assemble').configure {
-    finalizedBy 'moveNative'
-}
-
-tasks.register('moveNative', Copy) {
-    group 'build'
-    from 'build/lib/main/debug/'
-    include '**/**.dll', '**/**.so', '**/**.dylib'
-    eachFile {
-        it.path = it.name
-    }
-    into 'build/output'
-    doLast {
-        file('build/output').eachDir {
-            it.delete()
-        }
-    }
 }

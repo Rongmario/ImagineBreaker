@@ -6,7 +6,6 @@ plugins {
 }
 
 def onWindows = Os.isFamily(Os.FAMILY_WINDOWS)
-def onMac = Os.isFamily(Os.FAMILY_MAC)
 
 library {
 
@@ -40,24 +39,4 @@ library {
         }
     }
 
-    targetMachines = [
-            machines.windows.x86_64,
-            machines.windows.x86,
-            machines.macOS.x86_64,
-            machines.macOS.x86,
-            machines.linux.x86_64,
-            machines.linux.x86
-    ]
-
-}
-
-tasks.register('actionsBuild') {
-    group 'build'
-    if (onWindows) {
-        dependsOn 'linkReleaseWindowsX86-64', 'linkReleaseWindowsX86'
-    } else if (onMac) {
-        dependsOn 'linkReleaseMacosX86-64', 'linkReleaseMacosX86'
-    } else {
-        dependsOn 'linkReleaseLinuxX86-64', 'linkReleaseLinuxX86'
-    }
 }

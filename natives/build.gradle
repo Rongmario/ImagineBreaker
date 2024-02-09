@@ -1,4 +1,5 @@
 import org.gradle.internal.jvm.Jvm
+import org.apache.tools.ant.taskdefs.condition.Os
 
 plugins {
     id 'cpp-library'
@@ -6,7 +7,10 @@ plugins {
 
 library {
 
-    baseName = 'libImagineBreaker'
+    def archString = System.getProperty('os.arch')
+    def archBits = archString.contains('64') ? 'x64' : 'x32'
+
+    baseName = (Os.isFamily(Os.FAMILY_WINDOWS) ? 'libImagineBreaker' : 'ImagineBreaker') + "_$archBits"
 
     binaries.configureEach { CppBinary binary ->
         def compileTask = binary.compileTask.get()
@@ -31,6 +35,8 @@ library {
         }
     }
 
+    targetMachines = [ machines.windows.x86_64, machines.macOS.x86_64, machines.linux.x86_64 ]
+
 }
 
 tasks.named('assemble').configure {
@@ -38,7 +44,16 @@ tasks.named('assemble').configure {
 }
 
 tasks.register('moveNative', Copy) {
-    from 'build/lib/main/debug'
-    include '**.dll', '**.so', '**.dylib'
+    group 'build'
+    from 'build/lib/main/debug/'
+    include '**/**.dll', '**/**.so', '**/**.dylib'
+    eachFile {
+        it.path = it.name
+    }
     into 'build/output'
+    doLast {
+        file('build/output').eachDir {
+            it.delete()
+        }
+    }
 }

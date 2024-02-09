@@ -27,13 +27,8 @@ dependencies {
 }
 
 test {
-    useJUnitPlatform()
-    forkEvery 1
-    // TODO: separate args for separate tests(?)
-    jvmArgs '--add-opens=java.base/jdk.internal.misc=ALL-UNNAMED'
-    jvmArgs '--add-opens=java.base/jdk.internal.reflect=ALL-UNNAMED'
-
-    systemProperty "java.library.path", file("${project(":natives").buildDir}/lib/").absolutePath
+    enabled = false
+    finalizedBy 'testVendorsAndVersions'
 }
 
 def testVendorsAndVersions = tasks.register('testVendorsAndVersions') {
@@ -58,7 +53,7 @@ targetVendors.each { spec, info ->
                 toolchain.vendor = spec
             }
             test.useJUnitPlatform()
-            test.systemProperty "java.library.path", file("${project(":natives").buildDir}/lib/").absolutePath
+            test.systemProperty "java.library.path", file("${project(":natives").buildDir}/output/").absolutePath
         }
         testVendorsAndVersions.configure {
             dependsOn testTask

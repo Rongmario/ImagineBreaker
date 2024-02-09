@@ -21,7 +21,7 @@ jobs:
         with:
           gradle-version: current
       - name: Execute Gradle build
-        run: ./gradlew natives:build
+        run: ./gradlew natives:actionsBuild
       - name: Upload Artifact
         uses: actions/upload-artifact@v3
         with:

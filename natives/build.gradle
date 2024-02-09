@@ -5,15 +5,23 @@ plugins {
     id 'cpp-library'
 }
 
+def onWindows = Os.isFamily(Os.FAMILY_WINDOWS)
+def onMac = Os.isFamily(Os.FAMILY_MAC)
+
 library {
 
-    baseName = Os.isFamily(Os.FAMILY_WINDOWS) ? 'libImagineBreaker' : 'ImagineBreaker'
+    baseName = onWindows ? 'libImagineBreaker' : 'ImagineBreaker'
 
-    binaries.configureEach { CppBinary binary ->
-        def compileTask = binary.compileTask.get()
+    binaries.configureEach { CppSharedLibrary library ->
+        def compileTask = library.compileTask.get()
+
+        if (compileTask.name.contains("Release")) {
+            compileTask.debuggable(false)
+        }
+
         compileTask.includes.from("${Jvm.current().javaHome}/include")
 
-        def osFamily = binary.targetPlatform.targetMachine.operatingSystemFamily
+        def osFamily = library.targetPlatform.targetMachine.operatingSystemFamily
         if (osFamily.macOs) {
             compileTask.includes.from("${Jvm.current().javaHome}/include/darwin")
         } else if (osFamily.linux) {
@@ -24,7 +32,7 @@ library {
 
         compileTask.source.from fileTree(dir: "src/main/c", include: "**/*.c")
 
-        def toolChain = binary.toolChain
+        def toolChain = library.toolChain
         if (toolChain instanceof VisualCpp) {
             compileTask.compilerArgs.addAll(["/TC"])
         } else if (toolChain instanceof GccCompatibleToolChain) {
@@ -41,4 +49,15 @@ library {
             machines.linux.x86
     ]
 
+}
+
+tasks.register('actionsBuild') {
+    group 'build'
+    if (onWindows) {
+        dependsOn 'linkReleaseWindowsX86-64', 'linkReleaseWindowsX86'
+    } else if (onMac) {
+        dependsOn 'linkReleaseMacosX86-64', 'linkReleaseMacosX86'
+    } else {
+        dependsOn 'linkReleaseLinuxX86-64', 'linkReleaseLinuxX86'
+    }
 }

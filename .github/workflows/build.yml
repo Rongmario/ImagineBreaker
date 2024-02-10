@@ -19,10 +19,12 @@ jobs:
       - name: Compile
         run: |
           gcc -c -fPIC -I${JAVA_HOME}/include -I${JAVA_HOME}/include/linux ${{ env.PATH_TO_CODE }}.c -o ${{ env.PATH_TO_CODE }}_x64.o
+          gcc -m32 -c -fPIC -I${JAVA_HOME}/include -I${JAVA_HOME}/include/linux ${{ env.PATH_TO_CODE }}.c -o ${{ env.PATH_TO_CODE }}_x86.o
 
       - name: Link
         run: |
           gcc -shared -fPIC -o output/${{ env.LIB_NAME }}_x64.so ${{ env.PATH_TO_CODE }}_x64.o -lc
+          gcc -shared -fPIC -o output/${{ env.LIB_NAME }}_x86.so ${{ env.PATH_TO_CODE }}_x86.o -lc
 
       - name: Upload Natives
         uses: actions/upload-artifact@v3

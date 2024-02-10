@@ -19,15 +19,17 @@ jobs:
       - name: Install GCC-Multilib
         run: sudo apt-get install gcc-multilib
 
-      - name: Compile
-        run: |
-          gcc -c -fPIC -I${JAVA_HOME}/include -I${JAVA_HOME}/include/linux ${{ env.PATH_TO_CODE }}.c -o ${{ env.PATH_TO_CODE }}_x64.o
-          gcc -m32 -c -fPIC -I${JAVA_HOME}/include -I${JAVA_HOME}/include/linux ${{ env.PATH_TO_CODE }}.c -o ${{ env.PATH_TO_CODE }}_x86.o
+      - name: Compile for x64
+        run: gcc -c -fPIC -I${JAVA_HOME}/include -I${JAVA_HOME}/include/linux ${{ env.PATH_TO_CODE }}.c -o ${{ env.PATH_TO_CODE }}_x64.o
 
-      - name: Link
-        run: |
-          gcc -shared -fPIC -o output/${{ env.LIB_NAME }}_x64.so ${{ env.PATH_TO_CODE }}_x64.o -lc
-          gcc -shared -fPIC -o output/${{ env.LIB_NAME }}_x86.so ${{ env.PATH_TO_CODE }}_x86.o -lc
+      - name: Compile for x86
+        run: gcc -m32 -c -fPIC -I${JAVA_HOME}/include -I${JAVA_HOME}/include/linux ${{ env.PATH_TO_CODE }}.c -o ${{ env.PATH_TO_CODE }}_x86.o
+
+      - name: Link for x64
+        run: gcc -shared -fPIC -o output/${{ env.LIB_NAME }}_x64.so ${{ env.PATH_TO_CODE }}_x64.o -lc
+
+      - name: Link for x86
+        run: gcc -shared -fPIC -o output/${{ env.LIB_NAME }}_x86.so ${{ env.PATH_TO_CODE }}_x86.o -lc
 
       - name: Upload Natives
         uses: actions/upload-artifact@v3

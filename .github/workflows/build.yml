@@ -49,6 +49,12 @@ jobs:
       - name: Make Directory
         run: mkdir output
 
+      - name: Install Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
       - name: Install MSVC
         uses: ilammy/msvc-dev-cmd@v1
         with:

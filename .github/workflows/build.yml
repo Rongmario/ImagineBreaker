@@ -13,16 +13,19 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
+      - name: Make Directory
+        run: mkdir output
+
       - name: Compile
         run: |
-          gcc -c -fPIC -I${JAVA_HOME}/include -I${JAVA_HOME}/include/linux $PATH_TO_CODE.c -o $PATH_TO_CODE_x64.o
+          gcc -c -fPIC -I${JAVA_HOME}/include -I${JAVA_HOME}/include/linux ${{ env.PATH_TO_CODE }}.c -o ${{ env.PATH_TO_CODE }}_x64.o
 
       - name: Link
         run: |
-          gcc -shared -fPIC -o /lib/linux/$LIB_NAME_x64.so $PATH_TO_CODE_x64.o -lc
-          
+          gcc -shared -fPIC -o /output/${{ env.LIB_NAME }}_x64.so ${{ env.LIB_NAME }}_x64.o -lc
+
       - name: Upload Natives
         uses: actions/upload-artifact@v3
         with:
           name: native
-          path: /lib/linux/
+          path: output/

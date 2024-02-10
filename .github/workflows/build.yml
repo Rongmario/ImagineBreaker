@@ -5,6 +5,7 @@ on: push
 env:
   LIB_NAME: libImagineBreaker
   PATH_TO_CODE: natives/src/main/c/zone_rong_imaginebreaker_ImagineBreaker
+  PATH_TO_CODE_WIN: natives\src\main\c\zone_rong_imaginebreaker_ImagineBreaker
 
 jobs:
   linux_compile:
@@ -62,7 +63,7 @@ jobs:
           arch: ${{ matrix.arch[0] }}
 
       - name: Compile and Link for ${{ matrix.arch[1] }}
-        run: cl.exe -LD -I$JAVA_HOME/include -I$JAVA_HOME/include/win32 ${{ env.PATH_TO_CODE }}.c -link -out:output/${{ env.LIB_NAME }}_${{ matrix.arch[1] }}.dll
+        run: cl.exe -LD -I$JAVA_HOME\include -I$JAVA_HOME\include\win32 ${{ env.PATH_TO_CODE_WIN }}.c -link -out:output\${{ env.LIB_NAME }}_${{ matrix.arch[1] }}.dll
 
       - name: Upload Natives
         uses: actions/upload-artifact@v3

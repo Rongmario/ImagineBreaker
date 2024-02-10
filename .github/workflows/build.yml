@@ -4,30 +4,25 @@ on: push
 
 env:
   LIB_NAME: libImagineBreaker
-  INCLUDE: $JAVA_HOME/include
   PATH_TO_CODE: natives/src/main/c/zone_rong_imaginebreaker_ImagineBreaker
 
 jobs:
-  compile:
+  linux_compile:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Setup Java 17
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: 17
-
       - name: Compile
         run: |
-          x86_64-w64-mingw32-gcc -I"$INCLUDE" -I"$INCLUDE/win32" $PATH_TO_CODE.c -o $PATH_TO_CODE_x64.o
-          aarch64-w64-mingw32-gcc -I"$INCLUDE" -I"$INCLUDE/win32" $PATH_TO_CODE.c -o $PATH_TO_CODE_arm64.o
-          i686-w64-mingw32-gcc -m32 -I"$INCLUDE" -I"$INCLUDE/win32" $PATH_TO_CODE.c -o $PATH_TO_CODE_x32.o
+          gcc -c -fPIC -I${JAVA_HOME}/include -I${JAVA_HOME}/include/linux $PATH_TO_CODE.c -o $PATH_TO_CODE_x64.o
 
       - name: Link
         run: |
-          x86_64-w64-mingw32-gcc -shared -o /lib/win/$LIB_NAME_x64.dll $PATH_TO_CODE_x64.o -Wl,--add-stdcall-alias
-          aarch64-w64-mingw32-gcc -shared -o /lib/win/$LIB_NAME_arm64.dll $PATH_TO_CODE_arm64.o -Wl,--add-stdcall-alias
-          i686-w64-mingw32-gcc -shared -o /lib/win/$LIB_NAME_x32.dll $PATH_TO_CODE_x32.o -Wl,--add-stdcall-alias
+          gcc -shared -fPIC -o /lib/linux/$LIB_NAME_x64.so $PATH_TO_CODE_x64.o -lc
+          
+      - name: Upload Natives
+        uses: actions/upload-artifact@v3
+        with:
+          name: native
+          path: /lib/linux/

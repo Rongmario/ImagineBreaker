@@ -53,7 +53,7 @@ final class NativeLoader {
 
     public static void load() {
         try {
-            System.loadLibrary(getLibraryNameWithoutExt());
+            System.loadLibrary(getRawLibraryName());
         } catch (Throwable t) {
             loadFromJar(getLibraryName());
         }
@@ -97,10 +97,8 @@ final class NativeLoader {
         }
     }
 
-    private static String getLibraryNameWithoutExt() {
-        var name = "libImagineBreaker_";
-        var arch = "x" + ARCH_BITS;
-        return name + arch;
+    private static String getRawLibraryName() {
+        return "libImagineBreaker";
     }
 
     private static String getLibraryName() {

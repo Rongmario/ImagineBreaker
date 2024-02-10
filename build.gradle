@@ -53,7 +53,7 @@ targetVendors.each { spec, info ->
                 toolchain.vendor = spec
             }
             test.useJUnitPlatform()
-            test.systemProperty "java.library.path", file("${project(":natives").buildDir}/output/").absolutePath
+            test.systemProperty "java.library.path", file("${project(":natives").buildDir}/lib/main/debug/").absolutePath
         }
         testVendorsAndVersions.configure {
             dependsOn testTask

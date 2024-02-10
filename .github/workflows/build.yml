@@ -22,7 +22,7 @@ jobs:
 
       - name: Link
         run: |
-          gcc -shared -fPIC -o output/${{ env.LIB_NAME }}_x64.so ${{ env.LIB_NAME }}_x64.o -lc
+          gcc -shared -fPIC -o output/${{ env.LIB_NAME }}_x64.so ${{ env.PATH_TO_CODE }}_x64.o -lc
 
       - name: Upload Natives
         uses: actions/upload-artifact@v3

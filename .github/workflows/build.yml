@@ -16,6 +16,9 @@ jobs:
       - name: Make Directory
         run: mkdir output
 
+      - name: Install GCC-Multilib
+        run: sudo apt-get install gcc-multilib
+
       - name: Compile
         run: |
           gcc -c -fPIC -I${JAVA_HOME}/include -I${JAVA_HOME}/include/linux ${{ env.PATH_TO_CODE }}.c -o ${{ env.PATH_TO_CODE }}_x64.o

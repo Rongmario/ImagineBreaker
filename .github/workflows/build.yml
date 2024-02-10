@@ -36,3 +36,29 @@ jobs:
         with:
           name: native
           path: output/
+
+  windows_compile:
+    strategy:
+      matrix:
+        arch: [[x64, x64], [x86, x86], [amd64_arm64, arm64]]
+    runs-on: windows-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Make Directory
+        run: mkdir output
+
+      - name: Install MSVC
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: ${{ matrix.arch[0] }}
+
+      - name: Compile and Link for ${{ matrix.arch[1] }}
+        run: cl.exe -LD -I$JAVA_HOME/include -I$JAVA_HOME/include/win32 ${{ env.PATH_TO_CODE }}.c -link -out:output/${{ env.LIB_NAME }}_${{ matrix.arch[1] }}.dll
+
+      - name: Upload Natives
+        uses: actions/upload-artifact@v3
+        with:
+          name: native
+          path: output/

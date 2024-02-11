@@ -122,11 +122,11 @@ jobs:
       - name: Create Android MakeFile
         run:
           cat << EOF > ${{ env.PATH_TO_CODE_FOLDER }}/Android.mk
-          LOCAL_PATH := $(call my-dir)
-          include $(CLEAR_VARS)
+          LOCAL_PATH := \$(call my-dir)
+          include \$(CLEAR_VARS)
           LOCAL_MODULE := ImagineBreaker_android_${{ env.matrix.arch[1] }}
           LOCAL_SRC_FILES := ${{ env.CODE_FILE }}.c
-          include $(BUILD_SHARED_LIBRARY)
+          include \$(BUILD_SHARED_LIBRARY)
           EOF
 
       - name: Compile and Link

@@ -71,6 +71,9 @@ jobs:
           path: output/
 
   mac_os_compile:
+    strategy:
+      matrix:
+        arch: [[x86_x64, x64], [i386, x86], [arm64, arm64]]
     runs-on: macos-latest
     steps:
       - name: Checkout Repository
@@ -86,10 +89,10 @@ jobs:
           java-version: '17'
 
       - name: Compile
-        run: gcc -c -fPIC -I${JAVA_HOME}/include -I${JAVA_HOME}/include/darwin ${{ env.PATH_TO_CODE }}.c -o ${{ env.PATH_TO_CODE }}_x64.o
+        run: gcc -c -arch ${{ matrix.arch[0] }} -fPIC -I${JAVA_HOME}/include -I${JAVA_HOME}/include/darwin ${{ env.PATH_TO_CODE }}.c -o ${{ env.PATH_TO_CODE }}_${{ matrix.arch[1] }}.o
 
       - name: Link
-        run: gcc -dynamiclib -o output/${{ env.LIB_NAME }}_x64.dylib ${{ env.PATH_TO_CODE }}_x64.o -lc
+        run: gcc -dynamiclib -o output/${{ env.LIB_NAME }}_${{ matrix.arch[1] }}.dylib ${{ env.PATH_TO_CODE }}_${{ matrix.arch[1] }}.o -lc
 
       - name: Upload Natives
         uses: actions/upload-artifact@v3

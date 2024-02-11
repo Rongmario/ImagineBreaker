@@ -103,6 +103,9 @@ jobs:
           path: output/
 
   android_compile:
+    strategy:
+      matrix:
+        arch: [[armeabi-v7a, arm], [arm64-v8a, arm64], [x86, x86], [x86_64, x64]]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
@@ -124,15 +127,15 @@ jobs:
           contents: |
             LOCAL_PATH := $(call my-dir)
             include $(CLEAR_VARS)
-            LOCAL_MODULE := ImagineBreaker_android_arm64
+            LOCAL_MODULE := ImagineBreaker_android_${{ env.matrix.arch[1] }}
             LOCAL_SRC_FILES := ${{ env.CODE_FILE }}.c
             include $(BUILD_SHARED_LIBRARY)
 
       - name: Compile and Link
-        run: cd ${{ env.PATH_TO_CODE_FOLDER }} && ndk-build NDK_PROJECT_PATH=. APP_BUILD_SCRIPT=Android.mk APP_PLATFORM=android-21 APP_ABI=arm64-v8a
+        run: cd ${{ env.PATH_TO_CODE_FOLDER }} && ndk-build NDK_PROJECT_PATH=. APP_BUILD_SCRIPT=Android.mk APP_PLATFORM=android-21 APP_ABI=${{ env.matrix.arch[0] }}
 
       - name: Upload Natives
         uses: actions/upload-artifact@v3
         with:
           name: native
-          path: output/
+          path: src/main/cpp/libs/arm64-v8a

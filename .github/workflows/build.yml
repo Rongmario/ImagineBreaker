@@ -120,16 +120,14 @@ jobs:
           ndk-version: r25c
 
       - name: Create Android MakeFile
-        uses: DamianReeves/write-file-action@master
-        with:
-          path: ${{ env.PATH_TO_CODE_FOLDER }}/Android.mk
-          write-mode: overwrite
-          contents: |
-            LOCAL_PATH := $(call my-dir)
-            include $(CLEAR_VARS)
-            LOCAL_MODULE := ImagineBreaker_android_${{ env.matrix.arch[1] }}
-            LOCAL_SRC_FILES := ${{ env.CODE_FILE }}.c
-            include $(BUILD_SHARED_LIBRARY)
+        run:
+          cat << EOF > ${{ env.PATH_TO_CODE_FOLDER }}/Android.mk
+          LOCAL_PATH := $(call my-dir)
+          include $(CLEAR_VARS)
+          LOCAL_MODULE := ImagineBreaker_android_${{ env.matrix.arch[1] }}
+          LOCAL_SRC_FILES := ${{ env.CODE_FILE }}.c
+          include $(BUILD_SHARED_LIBRARY)
+          EOF
 
       - name: Compile and Link
         run: cd ${{ env.PATH_TO_CODE_FOLDER }} && ndk-build NDK_PROJECT_PATH=. APP_BUILD_SCRIPT=Android.mk APP_PLATFORM=android-21 APP_ABI=${{ env.matrix.arch[0] }}

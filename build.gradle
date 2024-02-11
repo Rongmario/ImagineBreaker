@@ -6,12 +6,12 @@ plugins {
 group 'zone.rong'
 version '1.3'
 
-tasks.withType(JavaExec) {
+tasks.withType(JavaExec).configureEach {
     jvmArgs '--add-opens=java.base/jdk.internal.misc=ALL-UNNAMED'
     jvmArgs '--add-opens=java.base/jdk.internal.reflect=ALL-UNNAMED'
 }
 
-tasks.withType(JavaCompile) {
+tasks.withType(JavaCompile).configureEach {
     options.compilerArgs += ["--add-exports=java.base/jdk.internal.misc=ALL-UNNAMED", '--add-exports=java.base/jdk.internal.reflect=ALL-UNNAMED']
 }
 
@@ -29,6 +29,10 @@ dependencies {
 test {
     enabled = false
     finalizedBy 'testVendorsAndVersions'
+}
+
+classes {
+    dependsOn ':natives:assemble'
 }
 
 def testVendorsAndVersions = tasks.register('testVendorsAndVersions') {

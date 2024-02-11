@@ -41,8 +41,7 @@ jobs:
   windows_compile:
     strategy:
       matrix:
-        # arch: [[x64, x64], [x86, x86], [amd64_arm64, arm64]]
-        arch: [[x64, x64]]
+        arch: [[x64, x64], [x86, x86], [amd64_arm64, arm64]]
     runs-on: windows-latest
     steps:
       - name: Checkout Repository

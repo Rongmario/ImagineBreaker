@@ -120,7 +120,7 @@ jobs:
           ndk-version: r25c
 
       - name: Create Android MakeFile
-        run: printf "LOCAL_PATH := \$(call my-dir)\ninclude \$(CLEAR_VARS)\nLOCAL_MODULE := ImagineBreaker_android_${{ env.matrix.arch[1] }}\nLOCAL_SRC_FILES := ${{ env.CODE_FILE }}.c\ninclude \$(BUILD_SHARED_LIBRARY)" > ${{ env.PATH_TO_CODE_FOLDER }}/Android.mk
+        run: printf "LOCAL_PATH := \$(call my-dir)\ninclude \$(CLEAR_VARS)\nLOCAL_MODULE := ImagineBreaker_android_${{ matrix.arch[1] }}\nLOCAL_SRC_FILES := ${{ env.CODE_FILE }}.c\ninclude \$(BUILD_SHARED_LIBRARY)" > ${{ env.PATH_TO_CODE_FOLDER }}/Android.mk
 
       - name: Compile and Link
         run: cd ${{ env.PATH_TO_CODE_FOLDER }} && ndk-build NDK_PROJECT_PATH=. APP_BUILD_SCRIPT=Android.mk APP_PLATFORM=android-21 APP_ABI=${{ env.matrix.arch[0] }}
@@ -129,4 +129,4 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: native
-          path: ${{ env.PATH_TO_CODE_FOLDER }}/libs/${{ env.matrix.arch[0] }}
+          path: ${{ env.PATH_TO_CODE_FOLDER }}/libs/${{ matrix.arch[0] }}

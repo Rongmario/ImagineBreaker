@@ -63,7 +63,7 @@ jobs:
           arch: ${{ matrix.arch[0] }}
 
       - name: Compile and Link for ${{ matrix.arch[1] }}
-        run: cl.exe -LD -I%JAVA_HOME%\include -I%JAVA_HOME%\include\win32 ${{ env.PATH_TO_CODE_WIN }}.c -link -out:output\${{ env.LIB_NAME }}_${{ matrix.arch[1] }}.dll
+        run: cl.exe -LD -I${{ env.JAVA_HOME }}\include -I${{ env.JAVA_HOME }}\include\win32 ${{ env.PATH_TO_CODE_WIN }}.c -link -out:output\${{ env.LIB_NAME }}_${{ matrix.arch[1] }}.dll
 
       - name: Upload Natives
         uses: actions/upload-artifact@v3

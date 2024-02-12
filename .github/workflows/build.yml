@@ -26,14 +26,6 @@ jobs:
           java-version: '17'
           cache: 'gradle'
 
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v3
-        with:
-          gradle-version: current
-
-      - name: Gradle Build
-        run: ./gradlew build
-
       - name: Install GCC-Multilib
         run: sudo apt-get install gcc-multilib
 
@@ -48,6 +40,14 @@ jobs:
 
       - name: Link for x86
         run: gcc -m32 -shared -fPIC -o output/${{ env.LIB_NAME }}_x86.so ${{ env.PATH_TO_CODE }}_x86.o -lc
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+        with:
+          gradle-version: current
+
+      - name: Gradle Build
+        run: ./gradlew build
 
       - name: Upload Natives
         uses: actions/upload-artifact@v3
@@ -74,14 +74,6 @@ jobs:
           java-version: '17'
           cache: 'gradle'
 
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v3
-        with:
-          gradle-version: current
-
-      - name: Gradle Build
-        run: ./gradlew build
-
       - name: Install MSVC
         uses: ilammy/msvc-dev-cmd@v1
         with:
@@ -89,6 +81,14 @@ jobs:
 
       - name: Compile and Link for ${{ matrix.arch[1] }}
         run: cl.exe -LD -I${{ env.JAVA_HOME }}\include -I${{ env.JAVA_HOME }}\include\win32 ${{ env.PATH_TO_CODE_WIN }}.c -link -out:output\${{ env.LIB_NAME }}_${{ matrix.arch[1] }}.dll
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+        with:
+          gradle-version: current
+
+      - name: Gradle Build
+        run: ./gradlew build
 
       - name: Upload Natives
         uses: actions/upload-artifact@v3
@@ -115,6 +115,12 @@ jobs:
           java-version: '17'
           cache: 'gradle'
 
+      - name: Compile
+        run: gcc -c -arch ${{ matrix.arch[0] }} -fPIC -I${JAVA_HOME}/include -I${JAVA_HOME}/include/darwin ${{ env.PATH_TO_CODE }}.c -o ${{ env.PATH_TO_CODE }}_${{ matrix.arch[1] }}.o
+
+      - name: Link
+        run: gcc -dynamiclib -o output/${{ env.LIB_NAME }}_${{ matrix.arch[1] }}.dylib ${{ env.PATH_TO_CODE }}_${{ matrix.arch[1] }}.o -lc
+
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
         with:
@@ -122,12 +128,6 @@ jobs:
 
       - name: Gradle Build
         run: ./gradlew build
-
-      - name: Compile
-        run: gcc -c -arch ${{ matrix.arch[0] }} -fPIC -I${JAVA_HOME}/include -I${JAVA_HOME}/include/darwin ${{ env.PATH_TO_CODE }}.c -o ${{ env.PATH_TO_CODE }}_${{ matrix.arch[1] }}.o
-
-      - name: Link
-        run: gcc -dynamiclib -o output/${{ env.LIB_NAME }}_${{ matrix.arch[1] }}.dylib ${{ env.PATH_TO_CODE }}_${{ matrix.arch[1] }}.o -lc
 
       - name: Upload Natives
         uses: actions/upload-artifact@v3
@@ -158,8 +158,19 @@ jobs:
       - name: Compile and Link
         run: cd ${{ env.PATH_TO_CODE_FOLDER }} && ndk-build NDK_PROJECT_PATH=. APP_BUILD_SCRIPT=Android.mk APP_PLATFORM=android-21 APP_ABI=${{ env.matrix.arch[0] }}
 
+      - name: Move Natives
+        run: mv  -v ~/${{ env.PATH_TO_CODE_FOLDER }}/libs/${{ matrix.arch[0] }} ~/output/
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+        with:
+          gradle-version: current
+
+      - name: Gradle Build
+        run: ./gradlew build
+
       - name: Upload Natives
         uses: actions/upload-artifact@v3
         with:
           name: native
-          path: ${{ env.PATH_TO_CODE_FOLDER }}/libs/${{ matrix.arch[0] }}
+          path: output/

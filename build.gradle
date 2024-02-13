@@ -11,6 +11,10 @@ tasks.withType(JavaExec).configureEach {
 }
 
 tasks.withType(JavaCompile).configureEach {
+    it.javaCompiler = javaToolchains.compilerFor { JavaToolchainSpec toolchain ->
+        toolchain.languageVersion = JavaLanguageVersion.of(11)
+        toolchain.vendor = JvmVendorSpec.AZUL
+    }
     options.compilerArgs += ['--add-exports=java.base/jdk.internal.reflect=ALL-UNNAMED']
 }
 
@@ -35,16 +39,16 @@ def testVendorsAndVersions = tasks.register('testVendorsAndVersions') {
 }
 
 def targetVendors = [
-        (JvmVendorSpec.AZUL): ["Azul", 17, 21],
-        (JvmVendorSpec.BELLSOFT): ["Bellsoft", 17, 21],
-        (JvmVendorSpec.GRAAL_VM): ["Graal", 17, 21],
-        (JvmVendorSpec.IBM): ["OpenJ9", 17, 21],
-        (JvmVendorSpec.MICROSOFT): ["Microsoft", 17, 21],
+        (JvmVendorSpec.AZUL): ["Azul", 11, 17, 21],
+        (JvmVendorSpec.BELLSOFT): ["Bellsoft", 11, 17, 21],
+        (JvmVendorSpec.GRAAL_VM): ["Graal", 11, 17, 21],
+        (JvmVendorSpec.IBM): ["OpenJ9", 11, 17, 21],
+        (JvmVendorSpec.MICROSOFT): ["Microsoft", 11, 17, 21],
 ]
 
 targetVendors.each { spec, info ->
     for (int i = 1; i < info.size(); i++) {
-        def javaVersion = info[i]
+        Integer javaVersion = info[i]
         def testTask = tasks.register("test${info[0]}_${javaVersion}", Test) { Test test ->
             group 'verification'
             test.javaLauncher = javaToolchains.launcherFor { JavaToolchainSpec toolchain ->
@@ -53,6 +57,9 @@ targetVendors.each { spec, info ->
             }
             test.useJUnitPlatform()
             test.jvmArgs '--add-opens=java.base/jdk.internal.reflect=ALL-UNNAMED'
+            if (javaVersion < 17) {
+                test.jvmArgs '--illegal-access=deny'
+            }
         }
         testVendorsAndVersions.configure {
             dependsOn testTask

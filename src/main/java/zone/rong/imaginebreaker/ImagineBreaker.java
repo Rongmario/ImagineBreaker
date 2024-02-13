@@ -8,6 +8,7 @@ import java.lang.invoke.VarHandle;
 import java.lang.ref.SoftReference;
 import java.lang.reflect.Field;
 import java.util.AbstractMap;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
@@ -24,7 +25,7 @@ public final class ImagineBreaker {
     private static final boolean IS_OPEN_J9 = isOpenJ9();
     private static final Unsafe UNSAFE = retrieveUnsafe();
     private static final MethodHandles.Lookup LOOKUP = retrieveLookup();
-    private static final Set<Module> EVERYONE_MODULE_SINGLETON = retrieveEveryoneModule();
+    private static final Set<Module> EVERYONE_MODULE_SET = retrieveEveryoneSet();
     private static final VarHandle MODULE$OPEN_PACKAGES = retrieveOpenPackagesHandle();
     private static final VarHandle CLASS$MODULE = retrieveModuleHandle();
     private static final VarHandle REFLECTION$FIELD_FILTER_MAP = retrieveFieldFilterMap();
@@ -85,7 +86,7 @@ public final class ImagineBreaker {
      * @param moduleClass class to have its module queried
      */
     public static void disguiseAsModule(Class<?> target, Class<?> moduleClass) {
-        var module = CLASS$MODULE.get(moduleClass);
+        Object module = CLASS$MODULE.get(moduleClass);
         CLASS$MODULE.set(target, module);
     }
 
@@ -113,7 +114,7 @@ public final class ImagineBreaker {
      * @param runnable    runnable to run before the class is reverted to having its module changed
      */
     public static void disguiseAsModule(Class<?> target, Class<?> moduleClass, Runnable runnable) {
-        var old = CLASS$MODULE.get(target);
+        Object old = CLASS$MODULE.get(target);
         disguiseAsModule(target, moduleClass);
         runnable.run();
         CLASS$MODULE.set(target, old);
@@ -129,7 +130,7 @@ public final class ImagineBreaker {
      * @param runnable runnable to run before the class is reverted to having its module changed
      */
     public static void disguiseAsModule(Class<?> target, Module module, Runnable runnable) {
-        var old = CLASS$MODULE.get(target);
+        Object old = CLASS$MODULE.get(target);
         disguiseAsModule(target, module);
         runnable.run();
         CLASS$MODULE.set(target, old);
@@ -144,7 +145,7 @@ public final class ImagineBreaker {
      */
     public static void wipeFieldFilters() {
         if (!IS_OPEN_J9) {
-            for (var clazz : ((Map<Class, Set>) REFLECTION$FIELD_FILTER_MAP.get()).keySet()) {
+            for (Class clazz : ((Map<Class, Set>) REFLECTION$FIELD_FILTER_MAP.get()).keySet()) {
                 CLASS$REFLECTION_DATA.setVolatile(clazz, null);
             }
         }
@@ -160,7 +161,7 @@ public final class ImagineBreaker {
      */
     public static void wipeMethodFilters() {
         if (!IS_OPEN_J9) {
-            for (var clazz : ((Map<Class, Set>) REFLECTION$METHOD_FILTER_MAP.get()).keySet()) {
+            for (Class clazz : ((Map<Class, Set>) REFLECTION$METHOD_FILTER_MAP.get()).keySet()) {
                 CLASS$REFLECTION_DATA.setVolatile(clazz, null);
             }
         }
@@ -173,7 +174,7 @@ public final class ImagineBreaker {
 
     private static Unsafe retrieveUnsafe() {
         try {
-            var theUnsafe = Unsafe.class.getDeclaredField("theUnsafe");
+            Field theUnsafe = Unsafe.class.getDeclaredField("theUnsafe");
             theUnsafe.setAccessible(true);
             return (Unsafe) theUnsafe.get(null);
         } catch (IllegalAccessException | NoSuchFieldException e) {
@@ -182,7 +183,7 @@ public final class ImagineBreaker {
     }
 
     private static MethodHandles.Lookup retrieveLookup() {
-        var methodHandles$lookup$implLookup = retrieveImplLookup();
+        Field methodHandles$lookup$implLookup = retrieveImplLookup();
         long offset = UNSAFE.staticFieldOffset(methodHandles$lookup$implLookup);
         return (MethodHandles.Lookup) UNSAFE.getObject(MethodHandles.Lookup.class, offset);
     }
@@ -195,10 +196,9 @@ public final class ImagineBreaker {
         }
     }
 
-    private static Set<Module> retrieveEveryoneModule() {
+    private static Set<Module> retrieveEveryoneSet() {
         try {
-            var everyoneModule$Handle = LOOKUP.findStaticVarHandle(Module.class, "EVERYONE_MODULE", Module.class);
-            return Set.of((Module) everyoneModule$Handle.get());
+            return (Set<Module>) LOOKUP.findStaticVarHandle(Module.class, "EVERYONE_SET", Set.class);
         } catch (NoSuchFieldException | IllegalAccessException e) {
             throw new RuntimeException(e);
         }
@@ -255,12 +255,12 @@ public final class ImagineBreaker {
 
         @Override
         public Set<Module> get(Object key) {
-            return EVERYONE_MODULE_SINGLETON;
+            return EVERYONE_MODULE_SET;
         }
 
         @Override
         public Set<Entry<String, Set<Module>>> entrySet() {
-            return Set.of();
+            return Collections.emptySet();
         }
 
     }

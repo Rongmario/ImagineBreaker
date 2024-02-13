@@ -4,10 +4,11 @@ import jdk.internal.reflect.Reflection;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Set;
 
-public class RemoveMethodFiltersTest {
+public class FilterTest {
 
     private static class Subject {
 
@@ -18,11 +19,22 @@ public class RemoveMethodFiltersTest {
     }
 
     @Test
+    public void removeFieldFilters() {
+        Assertions.assertThrows(NoSuchFieldException.class, this::retrieveModifiersField);
+        ImagineBreaker.wipeFieldFilters();
+        Assertions.assertDoesNotThrow(this::retrieveModifiersField);
+    }
+
+    @Test
     public void removeMethodFilters() {
         Reflection.registerMethodsToFilter(Subject.class, Set.of("subjectMethod"));
         Assertions.assertThrows(NoSuchMethodException.class, this::retrieveSubjectMethod);
-        ImagineBreaker.removeMethodReflectionFilters();
+        ImagineBreaker.wipeMethodFilters();
         Assertions.assertDoesNotThrow(this::retrieveSubjectMethod);
+    }
+
+    private Field retrieveModifiersField() throws NoSuchFieldException {
+        return Field.class.getDeclaredField("modifiers");
     }
 
     private Method retrieveSubjectMethod() throws NoSuchMethodException {

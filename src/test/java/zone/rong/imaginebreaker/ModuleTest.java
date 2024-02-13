@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.InaccessibleObjectException;
 
-public class OpenModulesTest {
+public class ModuleTest {
 
     @Test
     public void openBootModules() {

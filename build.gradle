@@ -7,8 +7,22 @@ plugins {
 group 'zone.rong'
 version '2.0'
 
+java {
+    withSourcesJar()
+    withJavadocJar()
+}
+
 tasks.withType(JavaExec).configureEach {
     jvmArgs '--add-opens=java.base/jdk.internal.reflect=ALL-UNNAMED'
+}
+
+tasks.withType(Javadoc).configureEach {
+    options {
+        quiet()
+        setEncoding 'UTF-8'
+        setSource '11'
+        addMultilineStringsOption('-add-exports').setValue(['java.base/jdk.internal.reflect=ALL-UNNAMED'])
+    }
 }
 
 tasks.withType(JavaCompile).configureEach {
@@ -72,6 +86,8 @@ publishing {
     publications {
         mavenJava(MavenPublication) {
             from components.java
+            sourcesJar
+            javadocJar
             artifactId = 'imaginebreaker'
         }
     }

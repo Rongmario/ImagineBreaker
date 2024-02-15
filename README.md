@@ -3,14 +3,14 @@
 # Imagine Breaker [幻想殺し]
 
 
-### *I will destroy that illusion of yours.* 
+### *I will destroy that illusion of yours.*
 
-<sub>(Disclaimer: use with care, I'll not be held responsible for your JVM burning up in flames)</sub>
+With the love of ~~JNI~~ Unsafe & MethodHandles/VarHandles API from Java 9 - 23, this provides:
 
-With the love of JNI, this supports:
-
-1. Breaking down the Java Platform Module System (JPMS) to allow Reflection into any base or requested modules
-2. Removal of Reflection Filters, allows retrieval of any fields/methods from classes that were previously blocked:
+1. Public-facing `sun.misc.Unsafe` API instance & maximum priviledge **(TRUSTED)** `MethodHandles$Lookup` instance.
+2. Breaking down the Java Platform Module System (JPMS) to open up any specified module
+3. Disguise as any specified Module, in order to fool `@CallerSensitive` methods
+4. Removal of Reflection Filters, allows retrieval of any fields from classes that were previously blocked:
 
    - `jdk.internal.reflect.ConstantPool`
    - `jdk.internal.reflect.Reflection`
@@ -24,6 +24,5 @@ With the love of JNI, this supports:
    - `java.lang.System`
    - `java.lang.invoke.MethodHandles$Lookup`
    - `java.lang.reflect.AccessibleObject`
-   - `sun.misc.Unsafe`
 
 Namesake: [Toaru Majutsu no Index](https://en.wikipedia.org/wiki/A_Certain_Magical_Index)

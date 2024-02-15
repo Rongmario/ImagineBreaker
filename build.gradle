@@ -12,10 +12,6 @@ java {
     withJavadocJar()
 }
 
-tasks.withType(JavaExec).configureEach {
-    jvmArgs '--add-opens=java.base/jdk.internal.reflect=ALL-UNNAMED'
-}
-
 tasks.withType(Javadoc).configureEach {
     options {
         quiet()
@@ -71,7 +67,6 @@ targetVendors.each { spec, info ->
                 toolchain.vendor = spec
             }
             test.useJUnitPlatform()
-            test.jvmArgs '--add-opens=java.base/jdk.internal.reflect=ALL-UNNAMED'
             if (javaVersion < 17) {
                 test.jvmArgs '--illegal-access=deny'
             }

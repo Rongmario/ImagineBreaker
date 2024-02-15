@@ -28,6 +28,8 @@ public final class ImagineBreaker {
 
     private static final Unsafe UNSAFE = retrieveUnsafe();
     private static final Lookup LOOKUP = retrieveLookup();
+    private static final MethodHandle MODULE$ADD_EXPORTS_TO_ALL_0 = retrieveAddExportsToAll0();
+
     private static final Set<Module> EVERYONE_MODULE_SET = retrieveEveryoneSet();
     private static final VarHandle MODULE$OPEN_PACKAGES = retrieveOpenPackagesHandle();
     private static final VarHandle CLASS$MODULE = retrieveModuleHandle();
@@ -60,6 +62,10 @@ public final class ImagineBreaker {
         openModuleLayer(ModuleLayer.boot());
     }
 
+    public static void openBootModule(String bootModule) {
+        openModule(ModuleLayer.boot().findModule(bootModule).orElseThrow());
+    }
+
     /**
      * Opens all modules within the specified ModuleLayer
      *
@@ -76,6 +82,13 @@ public final class ImagineBreaker {
      */
     public static void openModule(Module module) {
         MODULE$OPEN_PACKAGES.set(module, WorldRejector.INSTANCE);
+        for (String pkg : module.getPackages()) {
+            try {
+                MODULE$ADD_EXPORTS_TO_ALL_0.invokeExact(module, pkg);
+            } catch (Throwable e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 
     /**
@@ -199,6 +212,14 @@ public final class ImagineBreaker {
         }
     }
 
+    private static MethodHandle retrieveAddExportsToAll0() {
+        try {
+            return LOOKUP.findStatic(Module.class, "addExportsToAll0", MethodType.methodType(void.class, Module.class, String.class));
+        } catch (NoSuchMethodException | IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     private static Set<Module> retrieveEveryoneSet() {
         try {
             return (Set<Module>) LOOKUP.findStaticVarHandle(Module.class, "EVERYONE_SET", Set.class).get();
@@ -234,6 +255,7 @@ public final class ImagineBreaker {
 
     private static VarHandle retrieveFieldFilterMap() {
         try {
+            openBootModule("java.base");
             return LOOKUP.findStaticVarHandle(Reflection.class, "fieldFilterMap", Map.class);
         } catch (IllegalAccessException e1) {
             if (e1.getMessage().endsWith("Expected static field.")) {
@@ -251,6 +273,7 @@ public final class ImagineBreaker {
 
     private static VarHandle retrieveMethodFilterMap() {
         try {
+            openBootModule("java.base");
             return LOOKUP.findStaticVarHandle(Reflection.class, "methodFilterMap", Map.class);
         } catch (IllegalAccessException e1) {
             if (e1.getMessage().endsWith("Expected static field.")) {

@@ -1,9 +1,11 @@
-package zone.rong.imaginebreaker;
+package zone.rong.imaginebreaker.lookup;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledForJreRange;
 import org.junit.jupiter.api.condition.JRE;
+import org.junit.jupiter.api.parallel.Isolated;
+import zone.rong.imaginebreaker.ImagineBreaker;
 
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
@@ -11,6 +13,7 @@ import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
+@Isolated
 public class LookupTest {
 
     @Test

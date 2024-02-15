@@ -1,15 +1,17 @@
-package zone.rong.imaginebreaker;
+package zone.rong.imaginebreaker.module;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.parallel.Isolated;
+import zone.rong.imaginebreaker.ImagineBreaker;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.InaccessibleObjectException;
 
+@Isolated
 public class ModuleTest {
 
     @Test
-    public void openBootModules() throws ReflectiveOperationException {
+    public void openBootModules() {
         Assertions.assertThrows(RuntimeException.class, this::retrieveStringBackingArray);
         ImagineBreaker.openBootModules();
         Assertions.assertDoesNotThrow(this::retrieveStringBackingArray);

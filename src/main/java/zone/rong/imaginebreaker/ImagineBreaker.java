@@ -198,7 +198,7 @@ public final class ImagineBreaker {
 
     private static Set<Module> retrieveEveryoneSet() {
         try {
-            return (Set<Module>) LOOKUP.findStaticVarHandle(Module.class, "EVERYONE_SET", Set.class);
+            return (Set<Module>) LOOKUP.findStaticVarHandle(Module.class, "EVERYONE_SET", Set.class).get();
         } catch (NoSuchFieldException | IllegalAccessException e) {
             throw new RuntimeException(e);
         }

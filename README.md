@@ -25,4 +25,18 @@ With the love of ~~JNI~~ Unsafe & MethodHandles/VarHandles API from Java 9 - 23,
    - `java.lang.invoke.MethodHandles$Lookup`
    - `java.lang.reflect.AccessibleObject`
 
+## Usage
+`build.gradle`:
+```groovy
+repositories {
+    maven {
+        url 'https://maven.cleanroommc.com'
+    }
+}
+
+dependencies {
+    implementation 'zone.rong:imaginebreaker:2.0'
+}
+```
+
 Namesake: [Toaru Majutsu no Index](https://en.wikipedia.org/wiki/A_Certain_Magical_Index)

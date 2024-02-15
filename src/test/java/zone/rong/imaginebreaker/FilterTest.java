@@ -12,6 +12,8 @@ public class FilterTest {
 
     private static class Subject {
 
+        private static int subjectField = -1;
+
         private static int subjectMethod() {
             return -1;
         }
@@ -19,22 +21,43 @@ public class FilterTest {
     }
 
     @Test
-    public void removeFieldFilters() {
-        Assertions.assertThrows(NoSuchFieldException.class, this::retrieveModifiersField);
+    public void removeFieldFilters() throws ReflectiveOperationException {
+        registerFieldFilter();
+        Assertions.assertThrows(NoSuchFieldException.class, this::retrieveSubjectField);
         ImagineBreaker.wipeFieldFilters();
-        Assertions.assertDoesNotThrow(this::retrieveModifiersField);
+        Assertions.assertDoesNotThrow(this::retrieveSubjectMethod);
     }
 
     @Test
-    public void removeMethodFilters() {
-        Reflection.registerMethodsToFilter(Subject.class, Set.of("subjectMethod"));
+    public void removeMethodFilters() throws ReflectiveOperationException {
+        registerMethodFilter();
         Assertions.assertThrows(NoSuchMethodException.class, this::retrieveSubjectMethod);
         ImagineBreaker.wipeMethodFilters();
         Assertions.assertDoesNotThrow(this::retrieveSubjectMethod);
     }
 
-    private Field retrieveModifiersField() throws NoSuchFieldException {
-        return Field.class.getDeclaredField("modifiers");
+    private void registerFieldFilter() throws ReflectiveOperationException {
+        try {
+            Method method = Reflection.class.getDeclaredMethod("registerFieldsToFilter", Class.class, String[].class);
+            method.invoke(null, Subject.class, new String[] { "subjectField" });
+        } catch (Exception e) {
+            Method method = Reflection.class.getDeclaredMethod("registerFieldsToFilter", Class.class, Set.class);
+            method.invoke(null, Subject.class, Set.of("subjectField"));
+        }
+    }
+
+    private void registerMethodFilter() throws ReflectiveOperationException {
+        try {
+            Method method = Reflection.class.getDeclaredMethod("registerMethodsToFilter", Class.class, String[].class);
+            method.invoke(null, Subject.class, new String[] { "subjectMethod" });
+        } catch (Exception e) {
+            Method method = Reflection.class.getDeclaredMethod("registerMethodsToFilter", Class.class, Set.class);
+            method.invoke(null, Subject.class, Set.of("subjectMethod"));
+        }
+    }
+
+    private Field retrieveSubjectField() throws NoSuchFieldException {
+        return Subject.class.getDeclaredField("subjectField");
     }
 
     private Method retrieveSubjectMethod() throws NoSuchMethodException {

@@ -2,8 +2,8 @@ package zone.rong.imaginebreaker;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.junit.platform.commons.function.Try;
-import org.junit.platform.commons.util.ReflectionUtils;
+import org.junit.jupiter.api.condition.EnabledForJreRange;
+import org.junit.jupiter.api.condition.JRE;
 
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
@@ -13,13 +13,18 @@ import java.lang.reflect.Method;
 
 public class LookupTest {
 
-    // Can be 63 or 127
-    private static final Try<Object> EXPECTED_MODES = ReflectionUtils.tryToReadFieldValue(MethodHandles.Lookup.class, "ALL_MODES", null);
+    @Test
+    @EnabledForJreRange(min = JRE.JAVA_9, max = JRE.JAVA_16)
+    public void lookupOld() {
+        MethodHandles.Lookup lookup = ImagineBreaker.lookup();
+        Assertions.assertEquals(lookup.lookupModes(), ImagineBreaker.IS_OPEN_J9 ? 128 : 63);
+    }
 
     @Test
-    public void lookup() throws Exception {
+    @EnabledForJreRange(min = JRE.JAVA_17)
+    public void lookupNew() {
         MethodHandles.Lookup lookup = ImagineBreaker.lookup();
-        Assertions.assertTrue(lookup.lookupModes() == 63 || lookup.lookupModes() == 127);
+        Assertions.assertEquals(lookup.lookupModes(), 127);
     }
 
     @Test

@@ -3,7 +3,9 @@ package zone.rong.imaginebreaker;
 import jdk.internal.reflect.Reflection;
 import sun.misc.Unsafe;
 
-import java.lang.invoke.MethodHandles;
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles.Lookup;
+import java.lang.invoke.MethodType;
 import java.lang.invoke.VarHandle;
 import java.lang.ref.SoftReference;
 import java.lang.reflect.Field;
@@ -22,9 +24,10 @@ import java.util.Set;
  */
 public final class ImagineBreaker {
 
-    private static final boolean IS_OPEN_J9 = isOpenJ9();
+    public static final boolean IS_OPEN_J9 = isOpenJ9();
+
     private static final Unsafe UNSAFE = retrieveUnsafe();
-    private static final MethodHandles.Lookup LOOKUP = retrieveLookup();
+    private static final Lookup LOOKUP = retrieveLookup();
     private static final Set<Module> EVERYONE_MODULE_SET = retrieveEveryoneSet();
     private static final VarHandle MODULE$OPEN_PACKAGES = retrieveOpenPackagesHandle();
     private static final VarHandle CLASS$MODULE = retrieveModuleHandle();
@@ -46,7 +49,7 @@ public final class ImagineBreaker {
      *
      * @return instance of the trusted lookup.
      */
-    public static MethodHandles.Lookup lookup() {
+    public static Lookup lookup() {
         return LOOKUP;
     }
 
@@ -182,15 +185,15 @@ public final class ImagineBreaker {
         }
     }
 
-    private static MethodHandles.Lookup retrieveLookup() {
+    private static Lookup retrieveLookup() {
         Field methodHandles$lookup$implLookup = retrieveImplLookup();
         long offset = UNSAFE.staticFieldOffset(methodHandles$lookup$implLookup);
-        return (MethodHandles.Lookup) UNSAFE.getObject(MethodHandles.Lookup.class, offset);
+        return (Lookup) UNSAFE.getObject(Lookup.class, offset);
     }
 
     private static Field retrieveImplLookup() {
         try {
-            return MethodHandles.Lookup.class.getDeclaredField("IMPL_LOOKUP");
+            return Lookup.class.getDeclaredField("IMPL_LOOKUP");
         } catch (NoSuchFieldException e) {
             throw new RuntimeException(e);
         }
@@ -199,7 +202,16 @@ public final class ImagineBreaker {
     private static Set<Module> retrieveEveryoneSet() {
         try {
             return (Set<Module>) LOOKUP.findStaticVarHandle(Module.class, "EVERYONE_SET", Set.class).get();
-        } catch (NoSuchFieldException | IllegalAccessException e) {
+        } catch (IllegalAccessException e1) {
+            if (e1.getMessage().endsWith("Expected static field.")) {
+                try {
+                    return (Set<Module>) mockLookup(Module.class).findStaticVarHandle(Module.class, "EVERYONE_SET", Set.class).get();
+                } catch (Throwable e) {
+                    throw new RuntimeException(e);
+                }
+            }
+            throw new RuntimeException(e1);
+        } catch (NoSuchFieldException e) {
             throw new RuntimeException(e);
         }
     }
@@ -223,16 +235,34 @@ public final class ImagineBreaker {
     private static VarHandle retrieveFieldFilterMap() {
         try {
             return LOOKUP.findStaticVarHandle(Reflection.class, "fieldFilterMap", Map.class);
-        } catch (NoSuchFieldException | IllegalAccessException e) {
-            throw new RuntimeException(e);
+        } catch (IllegalAccessException e1) {
+            if (e1.getMessage().endsWith("Expected static field.")) {
+                try {
+                    return mockLookup(Reflection.class).findStaticVarHandle(Reflection.class, "fieldFilterMap", Map.class);
+                } catch (Throwable e) {
+                    throw new RuntimeException(e);
+                }
+            }
+            throw new RuntimeException(e1);
+        } catch (NoSuchFieldException e2) {
+            throw new RuntimeException(e2);
         }
     }
 
     private static VarHandle retrieveMethodFilterMap() {
         try {
             return LOOKUP.findStaticVarHandle(Reflection.class, "methodFilterMap", Map.class);
-        } catch (NoSuchFieldException | IllegalAccessException e) {
-            throw new RuntimeException(e);
+        } catch (IllegalAccessException e1) {
+            if (e1.getMessage().endsWith("Expected static field.")) {
+                try {
+                    return mockLookup(Reflection.class).findStaticVarHandle(Reflection.class, "methodFilterMap", Map.class);
+                } catch (Throwable e) {
+                    throw new RuntimeException(e);
+                }
+            }
+            throw new RuntimeException(e1);
+        } catch (NoSuchFieldException e2) {
+            throw new RuntimeException(e2);
         }
     }
 
@@ -245,6 +275,13 @@ public final class ImagineBreaker {
             }
             return null;
         }
+    }
+
+    // Extremely crude hack, used for OpenJ9 9 - 15, where nothing ever made sense
+    private static Lookup mockLookup(Class<?> mockClass) throws Throwable {
+        MethodHandle lookup$ctor = LOOKUP.findConstructor(Lookup.class,
+                                                          MethodType.methodType(void.class, Class.class, Class.class, int.class, boolean.class));
+        return (Lookup) lookup$ctor.invokeExact(mockClass, (Class) null, 31, false); // Magic number
     }
 
     private ImagineBreaker() { }

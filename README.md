@@ -35,7 +35,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'zone.rong:imaginebreaker:2.0'
+    implementation 'zone.rong:imaginebreaker:2.1'
 }
 ```
 

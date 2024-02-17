@@ -11,6 +11,7 @@ import java.lang.ref.SoftReference;
 import java.lang.reflect.Field;
 import java.util.AbstractMap;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -165,7 +166,7 @@ public final class ImagineBreaker {
                 CLASS$REFLECTION_DATA.setVolatile(clazz, null);
             }
         }
-        REFLECTION$FIELD_FILTER_MAP.setVolatile((Object) null);
+        REFLECTION$FIELD_FILTER_MAP.setVolatile(new HashMap<>());
     }
 
     /**
@@ -181,7 +182,7 @@ public final class ImagineBreaker {
                 CLASS$REFLECTION_DATA.setVolatile(clazz, null);
             }
         }
-        REFLECTION$METHOD_FILTER_MAP.setVolatile((Object) null);
+        REFLECTION$METHOD_FILTER_MAP.setVolatile(new HashMap<>());
     }
 
     private static boolean isOpenJ9() {

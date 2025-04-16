@@ -5,57 +5,59 @@ plugins {
 }
 
 group 'zone.rong'
-version '2.1'
+version '3.0'
 
 java {
+    toolchain {
+        sourceCompatibility = JavaVersion.VERSION_1_9
+        targetCompatibility = JavaVersion.VERSION_1_9
+        languageVersion = JavaLanguageVersion.of(9)
+    }
     withSourcesJar()
     withJavadocJar()
 }
 
-tasks.withType(Javadoc).configureEach {
-    options {
-        quiet()
-        setEncoding 'UTF-8'
-        setSource '11'
-        addMultilineStringsOption('-add-exports').setValue(['java.base/jdk.internal.reflect=ALL-UNNAMED'])
+sourceSets {
+    panama {
+        compileClasspath += main.output
+        runtimeClasspath += main.output
+        sourceCompatibility = JavaVersion.VERSION_22
+        targetCompatibility = JavaVersion.VERSION_22
     }
 }
-
-tasks.withType(JavaCompile).configureEach {
-    it.javaCompiler = javaToolchains.compilerFor { JavaToolchainSpec toolchain ->
-        toolchain.languageVersion = JavaLanguageVersion.of(11)
-        toolchain.vendor = JvmVendorSpec.AZUL
-    }
-    options.compilerArgs += ['--add-exports=java.base/jdk.internal.reflect=ALL-UNNAMED']
-}
-
-idea.project.settings.compiler.javac.javacAdditionalOptions = compileJava.options.compilerArgs.join(' ')
 
 repositories {
     mavenCentral()
 }
 
 dependencies {
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
+    implementation 'org.jspecify:jspecify:1.0.0'
+
+    testImplementation platform('org.junit:junit-bom:5.12.1')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
 test {
     enabled = false
-    finalizedBy 'testVendorsAndVersions'
 }
 
-def testVendorsAndVersions = tasks.register('testVendorsAndVersions') {
-    group 'verification'
+tasks.named('compilePanamaJava') {
+    it.javaCompiler = javaToolchains.compilerFor { JavaToolchainSpec toolchain ->
+        toolchain.languageVersion = JavaLanguageVersion.of(22)
+        toolchain.vendor = JvmVendorSpec.AZUL
+    }
 }
 
 def targetVendors = [
-        (JvmVendorSpec.AZUL): ["Azul", 11, 17, 21],
-        (JvmVendorSpec.BELLSOFT): ["Bellsoft", 11, 17, 21],
-        (JvmVendorSpec.GRAAL_VM): ["Graal", 11, 17, 21],
-        (JvmVendorSpec.IBM): ["OpenJ9", 11, 17, 21],
-        (JvmVendorSpec.MICROSOFT): ["Microsoft", 11, 17, 21],
+        (JvmVendorSpec.AZUL): ["Azul", 9, 11, 17, 21, 22, 23, 24],
+        (JvmVendorSpec.GRAAL_VM): ["Graal", 9, 11, 17, 21, 22, 23, 24],
+        (JvmVendorSpec.IBM): ["OpenJ9", 9, 11, 17, 21, 22, 23, 24],
 ]
+
+tasks.register('comprehensiveTest') {
+    group 'verification'
+}
 
 targetVendors.each { spec, info ->
     for (int i = 1; i < info.size(); i++) {
@@ -67,11 +69,8 @@ targetVendors.each { spec, info ->
                 toolchain.vendor = spec
             }
             test.useJUnitPlatform()
-            if (javaVersion < 17) {
-                test.jvmArgs '--illegal-access=deny'
-            }
         }
-        testVendorsAndVersions.configure {
+        comprehensiveTest.configure {
             dependsOn testTask
         }
     }

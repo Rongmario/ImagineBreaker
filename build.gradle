@@ -12,6 +12,7 @@ java {
         sourceCompatibility = JavaVersion.VERSION_1_9
         targetCompatibility = JavaVersion.VERSION_1_9
         languageVersion = JavaLanguageVersion.of(9)
+        vendor = JvmVendorSpec.AZUL
     }
     withSourcesJar()
     withJavadocJar()
@@ -36,10 +37,6 @@ dependencies {
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
-test {
-    enabled = false
-}
-
 tasks.named('compilePanamaJava', JavaCompile) {
     sourceCompatibility = JavaVersion.VERSION_22
     targetCompatibility = JavaVersion.VERSION_22
@@ -52,18 +49,17 @@ tasks.named('compilePanamaJava', JavaCompile) {
 def targetVendors = [
         (JvmVendorSpec.AZUL): ["Azul", 9, 11, 17, 21, 22, 23, 24],
         (JvmVendorSpec.GRAAL_VM): ["Graal", 17, 21, 22, 23, 24],
-        (JvmVendorSpec.IBM): ["OpenJ9", 9, 11, 17, 21, 22, 23, 24],
+        (JvmVendorSpec.IBM): ["Semeru", 9, 11, 17, 21, 22, 23, 24],
 ]
 
 tasks.register('comprehensiveTest') {
     group 'verification'
-    finalizedBy test
 }
 
 targetVendors.each { spec, info ->
     for (int i = 1; i < info.size(); i++) {
         Integer javaVersion = info[i]
-        def testTask = tasks.register("test${info[0]}_${javaVersion}", Test) { Test test ->
+        def testTask = tasks.register("test${info[0]}${javaVersion}", Test) { Test test ->
             group 'verification'
             test.javaLauncher = javaToolchains.launcherFor { JavaToolchainSpec toolchain ->
                 toolchain.languageVersion = JavaLanguageVersion.of(javaVersion)

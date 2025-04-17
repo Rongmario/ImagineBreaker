@@ -78,7 +78,7 @@ public final class ImagineBreakerImpl implements ImagineBreaker {
                 reflection$fieldFilterMap = $.trustedLookup().findStaticVarHandle(reflectionClass, "fieldFilterMap", Map.class);
                 reflection$methodFilterMap = $.trustedLookup().findStaticVarHandle(reflectionClass, "methodFilterMap", Map.class);
 
-                semeru$class$setReflectCache = Index.isSemeru() ? $.trustedLookup().findSetter(Class.class, "reflectData", Class.forName("java.lang.Class$ReflectData")) : null;
+                semeru$class$setReflectCache = Index.isSemeru() ? $.trustedLookup().findSetter(Class.class, "reflectCache", Class.forName("java.lang.Class$ReflectCache")) : null;
             } catch (ReflectiveOperationException e) {
                 throw new RuntimeException("Unable to construct handles", e);
             }

@@ -57,6 +57,7 @@ def targetVendors = [
 
 tasks.register('comprehensiveTest') {
     group 'verification'
+    finalizedBy test
 }
 
 targetVendors.each { spec, info ->
@@ -71,7 +72,7 @@ targetVendors.each { spec, info ->
             test.useJUnitPlatform()
         }
         comprehensiveTest.configure {
-            dependsOn testTask
+            finalizedBy testTask
         }
     }
 }

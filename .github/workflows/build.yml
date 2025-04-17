@@ -22,14 +22,17 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
 
-      - name: Run Comprehensive Test
-        run: ./gradlew comprehensiveTest
+      - name: Run Build and Scan
+        run: ./gradlew build --scan
+        with:
+          build-scan-publish: true
+          build-scan-terms-of-use-url: 'https://gradle.com/terms-of-service'
+          build-scan-terms-of-use-agree: 'yes'
 
-      - name: Upload Test Results
+      - name: Upload Build Artifacts
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: results
+          name: artifacts
           path: |
-            **/build/reports/
-            **/build/test-results/
+            **/build/libs/

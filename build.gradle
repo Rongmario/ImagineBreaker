@@ -51,7 +51,7 @@ tasks.named('compilePanamaJava', JavaCompile) {
 
 def targetVendors = [
         (JvmVendorSpec.AZUL): ["Azul", 9, 11, 17, 21, 22, 23, 24],
-        (JvmVendorSpec.GRAAL_VM): ["Graal", 9, 11, 17, 21, 22, 23, 24],
+        (JvmVendorSpec.GRAAL_VM): ["Graal", 17, 21, 22, 23, 24],
         (JvmVendorSpec.IBM): ["OpenJ9", 9, 11, 17, 21, 22, 23, 24],
 ]
 

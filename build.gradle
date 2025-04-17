@@ -21,8 +21,6 @@ sourceSets {
     panama {
         compileClasspath += main.output
         runtimeClasspath += main.output
-        sourceCompatibility = JavaVersion.VERSION_22
-        targetCompatibility = JavaVersion.VERSION_22
     }
 }
 
@@ -42,7 +40,9 @@ test {
     enabled = false
 }
 
-tasks.named('compilePanamaJava') {
+tasks.named('compilePanamaJava', JavaCompile) {
+    sourceCompatibility = JavaVersion.VERSION_22
+    targetCompatibility = JavaVersion.VERSION_22
     it.javaCompiler = javaToolchains.compilerFor { JavaToolchainSpec toolchain ->
         toolchain.languageVersion = JavaLanguageVersion.of(22)
         toolchain.vendor = JvmVendorSpec.AZUL

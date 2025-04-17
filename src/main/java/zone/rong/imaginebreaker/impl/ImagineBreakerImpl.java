@@ -53,14 +53,14 @@ public final class ImagineBreakerImpl implements ImagineBreaker {
     public void clearFieldFilters() {
         Map<Class, ?> fieldFilterMap = (Map<Class, ?>) Holder.reflection$fieldFilterMap.get();
         Holder.reflection$fieldFilterMap.set((Map) null);
-        fieldFilterMap.keySet().forEach(clazz -> Holder.clearReflectionCache(clazz));
+        fieldFilterMap.keySet().forEach(Holder::clearReflectionCache);
     }
 
     @Override
     public void clearMethodFilters() {
         Map<Class, ?> methodFilterMap = (Map<Class, ?>) Holder.reflection$methodFilterMap.get();
         Holder.reflection$methodFilterMap.set((Map) null);
-        methodFilterMap.keySet().forEach(clazz -> Holder.clearReflectionCache(clazz));
+        methodFilterMap.keySet().forEach(Holder::clearReflectionCache);
     }
 
     private static final class Holder {
@@ -75,8 +75,9 @@ public final class ImagineBreakerImpl implements ImagineBreaker {
                 class$reflectionData = Index.isSemeru() ? null : $.trustedLookup().findVarHandle(Class.class, "reflectionData", SoftReference.class);
 
                 Class<?> reflectionClass = Class.forName("jdk.internal.reflect.Reflection");
-                reflection$fieldFilterMap = $.trustedLookup().findStaticVarHandle(reflectionClass, "fieldFilterMap", Map.class);
-                reflection$methodFilterMap = $.trustedLookup().findStaticVarHandle(reflectionClass, "methodFilterMap", Map.class);
+                Lookup reflectionLookup = $.trustedLookup().in(reflectionClass);
+                reflection$fieldFilterMap = reflectionLookup.findStaticVarHandle(reflectionClass, "fieldFilterMap", Map.class);
+                reflection$methodFilterMap = reflectionLookup.findStaticVarHandle(reflectionClass, "methodFilterMap", Map.class);
 
                 semeru$class$setReflectCache = Index.isSemeru() ? $.trustedLookup().findSetter(Class.class, "reflectCache", Class.forName("java.lang.Class$ReflectCache")) : null;
             } catch (ReflectiveOperationException e) {

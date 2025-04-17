@@ -24,3 +24,12 @@ jobs:
 
       - name: Run Comprehensive Test
         run: ./gradlew comprehensiveTest
+
+      - name: Upload Test Results
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: results
+          path: |
+            **/build/reports/
+            **/build/test-results/

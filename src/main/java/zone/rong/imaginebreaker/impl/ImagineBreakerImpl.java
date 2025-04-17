@@ -53,30 +53,46 @@ public final class ImagineBreakerImpl implements ImagineBreaker {
     public void clearFieldFilters() {
         Map<Class, ?> fieldFilterMap = (Map<Class, ?>) Holder.reflection$fieldFilterMap.get();
         Holder.reflection$fieldFilterMap.set((Map) null);
-        fieldFilterMap.keySet().forEach(clazz -> Holder.class$reflectionData.set(clazz, (SoftReference) null));
+        fieldFilterMap.keySet().forEach(clazz -> Holder.clearReflectionCache(clazz));
     }
 
     @Override
     public void clearMethodFilters() {
         Map<Class, ?> methodFilterMap = (Map<Class, ?>) Holder.reflection$methodFilterMap.get();
         Holder.reflection$methodFilterMap.set((Map) null);
-        methodFilterMap.keySet().forEach(clazz -> Holder.class$reflectionData.set(clazz, (SoftReference) null));
+        methodFilterMap.keySet().forEach(clazz -> Holder.clearReflectionCache(clazz));
     }
 
     private static final class Holder {
 
         private static final ImagineBreaker $ = Index.get();
         private static final VarHandle class$module, class$reflectionData, reflection$fieldFilterMap, reflection$methodFilterMap;
+        private static final MethodHandle semeru$class$setReflectCache;
 
         static {
             try {
                 class$module = $.trustedLookup().findVarHandle(Class.class, "module", Module.class);
-                class$reflectionData = $.trustedLookup().findVarHandle(Class.class, "reflectionData", SoftReference.class);
+                class$reflectionData = Index.isSemeru() ? null : $.trustedLookup().findVarHandle(Class.class, "reflectionData", SoftReference.class);
+
                 Class<?> reflectionClass = Class.forName("jdk.internal.reflect.Reflection");
                 reflection$fieldFilterMap = $.trustedLookup().findStaticVarHandle(reflectionClass, "fieldFilterMap", Map.class);
                 reflection$methodFilterMap = $.trustedLookup().findStaticVarHandle(reflectionClass, "methodFilterMap", Map.class);
+
+                semeru$class$setReflectCache = Index.isSemeru() ? $.trustedLookup().findSetter(Class.class, "reflectData", Class.forName("java.lang.Class$ReflectData")) : null;
             } catch (ReflectiveOperationException e) {
                 throw new RuntimeException("Unable to construct handles", e);
+            }
+        }
+
+        private static void clearReflectionCache(Class<?> clazz) {
+            if (class$reflectionData == null) {
+                try {
+                    semeru$class$setReflectCache.invoke(clazz, null);
+                } catch (Throwable e) {
+                    throw new RuntimeException("Unable to clear reflection cache", e);
+                }
+            } else {
+                class$reflectionData.setVolatile(clazz, (SoftReference<?>) null);
             }
         }
 

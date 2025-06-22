@@ -12,6 +12,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * TODO: likely will break when <a href="https://openjdk.org/projects/amber/design-notes/towards-better-serialization">this</a> is fully realized
@@ -50,24 +51,35 @@ public final class ImagineBreakerImpl implements ImagineBreaker {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void clearFieldFilters() {
-        Map<Class, ?> fieldFilterMap = (Map<Class, ?>) Holder.reflection$fieldFilterMap.get();
-        Holder.reflection$fieldFilterMap.set((Map) null);
+        Map<Class<?>, Set<String>> fieldFilterMap = (Map<Class<?>, Set<String>>) Holder.reflection$fieldFilterMap.get();
+        Holder.reflection$fieldFilterMap.set((Map<Class<?>, Set<String>>) null);
         fieldFilterMap.keySet().forEach(Holder::clearReflectionCache);
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void clearMethodFilters() {
-        Map<Class, ?> methodFilterMap = (Map<Class, ?>) Holder.reflection$methodFilterMap.get();
-        Holder.reflection$methodFilterMap.set((Map) null);
+        Map<Class<?>, Set<String>> methodFilterMap = (Map<Class<?>, Set<String>> ) Holder.reflection$methodFilterMap.get();
+        Holder.reflection$methodFilterMap.set((Map<Class<?>, Set<String>>) null);
         methodFilterMap.keySet().forEach(Holder::clearReflectionCache);
+    }
+
+    @Override
+    public Lookup trustedLookup(Class<?> lookupClass, Class<?> prevLookupClass) {
+        try {
+            return (Lookup) Holder.lookup$newLookup.invoke(lookupClass, prevLookupClass, Holder.lookup$trust.get(this.trustedLookup()));
+        } catch (Throwable t) {
+            throw new IllegalStateException("Unable to get trusted lookup instance", t);
+        }
     }
 
     private static final class Holder {
 
         private static final ImagineBreaker $ = Index.get();
-        private static final VarHandle class$module, class$reflectionData, reflection$fieldFilterMap, reflection$methodFilterMap;
-        private static final MethodHandle semeru$class$setReflectCache;
+        private static final VarHandle class$module, class$reflectionData, reflection$fieldFilterMap, reflection$methodFilterMap, lookup$trust;
+        private static final MethodHandle semeru$class$setReflectCache, lookup$newLookup;
 
         static {
             try {
@@ -80,6 +92,10 @@ public final class ImagineBreakerImpl implements ImagineBreaker {
                 reflection$methodFilterMap = reflectionLookup.findStaticVarHandle(reflectionClass, "methodFilterMap", Map.class);
 
                 semeru$class$setReflectCache = Index.isSemeru() ? $.trustedLookup().findSetter(Class.class, "reflectCache", Class.forName("java.lang.Class$ReflectCache")) : null;
+
+                Lookup lookupLookup = $.trustedLookup().in(Lookup.class);
+                lookup$newLookup = lookupLookup.unreflect(Lookup.class.getDeclaredMethod("newLookup", Class.class, Class.class, int.class));
+                lookup$trust = lookupLookup.findVarHandle(Lookup.class, "allowedModes", int.class);
             } catch (ReflectiveOperationException e) {
                 throw new RuntimeException("Unable to construct handles", e);
             }

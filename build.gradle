@@ -37,6 +37,10 @@ dependencies {
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
+tasks.named('test', Test) {
+    useJUnitPlatform()
+}
+
 tasks.named('compilePanamaJava', JavaCompile) {
     sourceCompatibility = JavaVersion.VERSION_22
     targetCompatibility = JavaVersion.VERSION_22
@@ -47,9 +51,9 @@ tasks.named('compilePanamaJava', JavaCompile) {
 }
 
 def targetVendors = [
-        (JvmVendorSpec.AZUL): ["Azul", 9, 11, 17, 21, 22, 23, 24],
-        (JvmVendorSpec.GRAAL_VM): ["Graal", 17, 21, 22, 23, 24],
-        (JvmVendorSpec.IBM): ["Semeru", 11, 17, 21, 22, 23],
+        (JvmVendorSpec.AZUL): ["Azul", 9, 11, 17, 21, 22, 23, 24, 25, 26],
+        (JvmVendorSpec.GRAAL_VM): ["Graal", 17, 21, 22, 23, 24, 25],
+        (JvmVendorSpec.IBM): ["Semeru", 11, 17, 21, 22, 23, 25],
 ]
 
 tasks.register('comprehensiveTest') {
@@ -66,6 +70,9 @@ targetVendors.each { spec, info ->
                 toolchain.vendor = spec
             }
             test.useJUnitPlatform()
+            if (javaVersion >= 26) {
+                test.jvmArgs('--illegal-final-field-mutation=deny')
+            }
         }
         comprehensiveTest.configure {
             finalizedBy testTask

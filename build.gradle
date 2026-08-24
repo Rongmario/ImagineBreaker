@@ -50,6 +50,10 @@ tasks.named('compilePanamaJava', JavaCompile) {
     }
 }
 
+tasks.named('check') {
+    dependsOn tasks.named('compilePanamaJava')
+}
+
 def targetVendors = [
         (JvmVendorSpec.AZUL): ["Azul", 9, 11, 17, 21, 22, 23, 24, 25, 26],
         (JvmVendorSpec.GRAAL_VM): ["Graal", 17, 21, 22, 23, 24, 25],

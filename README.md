@@ -1,4 +1,4 @@
-<img style="float: right;" src="https://i.imgur.com/rimNwts.png" width="40%" height="40%">
+<img src="docs/images/he_punches_women.png" align="right" width="30%">
 
 # Imagine Breaker [幻想殺し]
 
@@ -7,7 +7,7 @@
 
 With the love of ~~JNI~~ Unsafe & MethodHandles/VarHandles API from Java 9 - 23, this provides:
 
-1. Public-facing `sun.misc.Unsafe` API instance & maximum priviledge **(TRUSTED)** `MethodHandles$Lookup` instance.
+1. Public-facing `sun.misc.Unsafe` API instance & maximum privilege **(TRUSTED)** `MethodHandles$Lookup` instance.
 2. Breaking down the Java Platform Module System (JPMS) to open up any specified module
 3. Disguise as any specified Module, in order to fool `@CallerSensitive` methods
 4. Removal of Reflection Filters, allows retrieval of any fields from classes that were previously blocked:

@@ -1,7 +1,6 @@
-<img src="docs/images/he_punches_women.png" align="right" width="30%">
-
 # Imagine Breaker [幻想殺し]
 
+<img src="docs/images/he_punches_women.png" align="right" width="40%">
 
 ### *I will destroy that illusion of yours.*
 

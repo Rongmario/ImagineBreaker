@@ -10,14 +10,9 @@ public final class Index {
 
     private static final boolean isSemeru = System.getProperty("java.vm.vendor").toLowerCase(Locale.ENGLISH).contains("openj9");
 
-    private static ImagineBreaker impl;
-
     @NonNull
     public static ImagineBreaker get() {
-        if (impl == null) {
-            impl = new ImagineBreakerImpl();
-        }
-        return impl;
+        return PrivilegeEnclave.IMPL;
     }
 
     public static boolean isSemeru() {
@@ -27,6 +22,12 @@ public final class Index {
     @Deprecated
     public static boolean isOpenJ9() {
         return isSemeru();
+    }
+
+    private static final class PrivilegeEnclave {
+
+        private static final ImagineBreaker IMPL = new ImagineBreakerImpl();
+
     }
 
 }

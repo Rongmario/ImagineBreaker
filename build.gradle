@@ -18,13 +18,6 @@ java {
     withJavadocJar()
 }
 
-sourceSets {
-    panama {
-        compileClasspath += main.output
-        runtimeClasspath += main.output
-    }
-}
-
 repositories {
     mavenCentral()
 }
@@ -39,19 +32,6 @@ dependencies {
 
 tasks.named('test', Test) {
     useJUnitPlatform()
-}
-
-tasks.named('compilePanamaJava', JavaCompile) {
-    sourceCompatibility = JavaVersion.VERSION_22
-    targetCompatibility = JavaVersion.VERSION_22
-    it.javaCompiler = javaToolchains.compilerFor { JavaToolchainSpec toolchain ->
-        toolchain.languageVersion = JavaLanguageVersion.of(22)
-        toolchain.vendor = JvmVendorSpec.AZUL
-    }
-}
-
-tasks.named('check') {
-    dependsOn tasks.named('compilePanamaJava')
 }
 
 def targetVendors = [

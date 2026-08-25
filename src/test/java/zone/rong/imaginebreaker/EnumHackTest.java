@@ -32,6 +32,17 @@ public class EnumHackTest {
         Assertions.assertEquals("cee", Named.values()[2].label);
     }
 
+    @Test
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    public void invalidEnumOperationsThrowBeforeUnsafe() {
+        ImagineBreaker ib = Index.get();
+        Assertions.assertThrows(NullPointerException.class, () -> ib.clearEnumCache(null));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> ib.clearEnumCache((Class) String.class));
+        Assertions.assertThrows(IllegalArgumentException.class, () ->
+                ib.newEnum(Flavor.class, "SALT", 2, new Class<?>[0], new Object[] { "extra" }));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> ib.addEnum((Class) Flavor.class, Named.A));
+    }
+
     enum Flavor {
 
         VANILLA,

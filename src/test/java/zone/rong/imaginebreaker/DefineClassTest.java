@@ -32,6 +32,23 @@ public class DefineClassTest {
     }
 
     @Test
+    public void defineClassRejectsInvalidBytecodeRange() {
+        ImagineBreaker ib = Index.get();
+        byte[] bytecode = new byte[4];
+        Assertions.assertThrows(IndexOutOfBoundsException.class, () ->
+                ib.defineClass(DefineClassTest.class.getClassLoader(), null, bytecode, -1, 1, null));
+        Assertions.assertThrows(IndexOutOfBoundsException.class, () ->
+                ib.defineClass(null, null, bytecode, 2, 3, null));
+    }
+
+    @Test
+    public void defineHiddenClassRejectsNullBeforeUnsafeFallback() {
+        ImagineBreaker ib = Index.get();
+        Assertions.assertThrows(NullPointerException.class, () -> ib.defineHiddenClass(null, new byte[0], false));
+        Assertions.assertThrows(NullPointerException.class, () -> ib.defineHiddenClass(DefineClassTest.class, null, false));
+    }
+
+    @Test
     public void ensureInitializedRunsClinit() {
         ImagineBreaker ib = Index.get();
         java.lang.reflect.Field initialized = ib.declaredField(Lazy.class, "initialized");

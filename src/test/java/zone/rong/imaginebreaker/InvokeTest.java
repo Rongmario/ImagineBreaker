@@ -36,6 +36,14 @@ public class InvokeTest {
         Assertions.assertEquals(0, secret.value);
     }
 
+    @Test
+    public void allocateRejectsNonInstantiableTypesBeforeUnsafe() {
+        ImagineBreaker ib = Index.get();
+        Assertions.assertThrows(NullPointerException.class, () -> ib.allocate(null));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> ib.allocate(int.class));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> ib.allocate(Runnable.class));
+    }
+
     static final class Secret {
 
         final int value;

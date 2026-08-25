@@ -198,91 +198,148 @@ public abstract class AbstractImagineBreaker implements ImagineBreaker {
 
     @Override
     public boolean getBoolean(Object instance, Field field) {
+        checkFieldType(field, boolean.class);
         return Holder.getBoolean(fieldBase(instance, field), fieldOffset(field));
     }
 
     @Override
     public byte getByte(Object instance, Field field) {
+        checkFieldType(field, byte.class);
         return Holder.getByte(fieldBase(instance, field), fieldOffset(field));
     }
 
     @Override
     public short getShort(Object instance, Field field) {
+        checkFieldType(field, short.class);
         return Holder.getShort(fieldBase(instance, field), fieldOffset(field));
     }
 
     @Override
     public char getChar(Object instance, Field field) {
+        checkFieldType(field, char.class);
         return Holder.getChar(fieldBase(instance, field), fieldOffset(field));
     }
 
     @Override
     public int getInt(Object instance, Field field) {
+        checkFieldType(field, int.class);
         return Holder.getInt(fieldBase(instance, field), fieldOffset(field));
     }
 
     @Override
     public long getLong(Object instance, Field field) {
+        checkFieldType(field, long.class);
         return Holder.getLong(fieldBase(instance, field), fieldOffset(field));
     }
 
     @Override
     public float getFloat(Object instance, Field field) {
+        checkFieldType(field, float.class);
         return Holder.getFloat(fieldBase(instance, field), fieldOffset(field));
     }
 
     @Override
     public double getDouble(Object instance, Field field) {
+        checkFieldType(field, double.class);
         return Holder.getDouble(fieldBase(instance, field), fieldOffset(field));
     }
 
     @Override
     public void set(Object instance, Field field, Object value) {
-        Holder.set(fieldBase(instance, field), fieldOffset(field), field.getType(), value);
+        Class<?> type = field.getType();
+        if (!type.isPrimitive()) {
+            if (value != null && !type.isInstance(value)) {
+                throw invalidValue(field, value);
+            }
+            Holder.putReference(fieldBase(instance, field), fieldOffset(field), value);
+        } else {
+            if (!isExactPrimitiveValue(type, value)) {
+                throw invalidValue(field, value);
+            }
+            Holder.set(fieldBase(instance, field), fieldOffset(field), type, value);
+        }
     }
 
     @Override
     public void setBoolean(Object instance, Field field, boolean value) {
+        checkFieldType(field, boolean.class);
         Holder.setBoolean(fieldBase(instance, field), fieldOffset(field), value);
     }
 
     @Override
     public void setByte(Object instance, Field field, byte value) {
+        checkFieldType(field, byte.class);
         Holder.setByte(fieldBase(instance, field), fieldOffset(field), value);
     }
 
     @Override
     public void setShort(Object instance, Field field, short value) {
+        checkFieldType(field, short.class);
         Holder.setShort(fieldBase(instance, field), fieldOffset(field), value);
     }
 
     @Override
     public void setChar(Object instance, Field field, char value) {
+        checkFieldType(field, char.class);
         Holder.setChar(fieldBase(instance, field), fieldOffset(field), value);
     }
 
     @Override
     public void setInt(Object instance, Field field, int value) {
+        checkFieldType(field, int.class);
         Holder.setInt(fieldBase(instance, field), fieldOffset(field), value);
     }
 
     @Override
     public void setLong(Object instance, Field field, long value) {
+        checkFieldType(field, long.class);
         Holder.setLong(fieldBase(instance, field), fieldOffset(field), value);
     }
 
     @Override
     public void setFloat(Object instance, Field field, float value) {
+        checkFieldType(field, float.class);
         Holder.setFloat(fieldBase(instance, field), fieldOffset(field), value);
     }
 
     @Override
     public void setDouble(Object instance, Field field, double value) {
+        checkFieldType(field, double.class);
         Holder.setDouble(fieldBase(instance, field), fieldOffset(field), value);
     }
 
     private Object fieldBase(Object instance, Field field) {
-        return Modifier.isStatic(field.getModifiers()) ? Holder.staticBase(field) : instance;
+        if (Modifier.isStatic(field.getModifiers())) {
+            return Holder.staticBase(field);
+        }
+        if (instance == null) {
+            throw new NullPointerException("Cannot access instance field " + field + " on null");
+        }
+        if (!field.getDeclaringClass().isInstance(instance)) {
+            throw new IllegalArgumentException("Cannot access " + field + " on " + instance.getClass().getName());
+        }
+        return instance;
+    }
+
+    private void checkFieldType(Field field, Class<?> expectedType) {
+        if (field.getType() != expectedType) {
+            throw new IllegalArgumentException("Cannot access " + field + " as " + expectedType.getName());
+        }
+    }
+
+    private boolean isExactPrimitiveValue(Class<?> type, Object value) {
+        return type == boolean.class && value instanceof Boolean
+                || type == byte.class && value instanceof Byte
+                || type == short.class && value instanceof Short
+                || type == char.class && value instanceof Character
+                || type == int.class && value instanceof Integer
+                || type == long.class && value instanceof Long
+                || type == float.class && value instanceof Float
+                || type == double.class && value instanceof Double;
+    }
+
+    private IllegalArgumentException invalidValue(Field field, Object value) {
+        return new IllegalArgumentException("Cannot set " + field + " to " + (value == null ? "null" : value.getClass().getName()));
     }
 
     @Override
@@ -311,6 +368,12 @@ public abstract class AbstractImagineBreaker implements ImagineBreaker {
     @Override
     @SuppressWarnings("unchecked")
     public <T> T allocate(Class<T> type) {
+        if (type == null) {
+            throw new NullPointerException("type");
+        }
+        if (type.isPrimitive() || type.isArray() || type.isInterface() || Modifier.isAbstract(type.getModifiers())) {
+            throw new IllegalArgumentException("Cannot allocate an instance of " + type.getTypeName());
+        }
         try {
             return (T) unsafe().allocateInstance(type);
         } catch (InstantiationException e) {
@@ -364,6 +427,12 @@ public abstract class AbstractImagineBreaker implements ImagineBreaker {
 
     @Override
     public Class<?> defineClass(ClassLoader loader, String name, byte[] bytecode, int offset, int length, ProtectionDomain protectionDomain) {
+        if (bytecode == null) {
+            throw new NullPointerException("bytecode");
+        }
+        if (offset < 0 || length < 0 || offset > bytecode.length - length) {
+            throw new IndexOutOfBoundsException("offset=" + offset + ", length=" + length + ", bytecode.length=" + bytecode.length);
+        }
         if (loader != null) {
             try {
                 return (Class<?>) Define.classLoader$defineClass.invokeExact(loader, name, bytecode, offset, length, protectionDomain);
@@ -383,6 +452,12 @@ public abstract class AbstractImagineBreaker implements ImagineBreaker {
 
     @Override
     public Class<?> defineHiddenClass(Class<?> host, byte[] bytecode, boolean initialize, String... classOptions) {
+        if (host == null) {
+            throw new NullPointerException("host");
+        }
+        if (bytecode == null) {
+            throw new NullPointerException("bytecode");
+        }
         if (Define.lookup$defineHiddenClass != null && Define.classOptionClass != null) {
             Object options = classOptions(classOptions);
             try {
@@ -424,8 +499,12 @@ public abstract class AbstractImagineBreaker implements ImagineBreaker {
 
     @Override
     public <T extends Enum<T>> T newEnum(Class<T> type, String name, int ordinal, Class<?>[] parameterTypes, Object[] arguments) {
+        checkEnumType(type);
         Class<?>[] extra = parameterTypes == null ? new Class<?>[0] : parameterTypes;
         Object[] extraArgs = arguments == null ? new Object[0] : arguments;
+        if (extra.length != extraArgs.length) {
+            throw new IllegalArgumentException("parameterTypes and arguments have different lengths");
+        }
         Class<?>[] fullTypes = new Class<?>[extra.length + 2];
         fullTypes[0] = String.class;
         fullTypes[1] = int.class;
@@ -443,6 +522,13 @@ public abstract class AbstractImagineBreaker implements ImagineBreaker {
 
     @Override
     public <T extends Enum<T>> void addEnum(Class<T> type, T value) {
+        checkEnumType(type);
+        if (value == null) {
+            throw new NullPointerException("value");
+        }
+        if (!type.isInstance(value)) {
+            throw new IllegalArgumentException(value.getDeclaringClass().getName() + " is not a constant of " + type.getName());
+        }
         Field values = null;
         Field potential = null;
         Field[] fields = declaredFields(type);
@@ -478,6 +564,15 @@ public abstract class AbstractImagineBreaker implements ImagineBreaker {
     @Override
     public void clearEnumCache(Class<? extends Enum<?>> type) {
         Members.clearEnumCache(type);
+    }
+
+    private static void checkEnumType(Class<?> type) {
+        if (type == null) {
+            throw new NullPointerException("type");
+        }
+        if (!type.isEnum()) {
+            throw new IllegalArgumentException(type.getName() + " is not an enum type");
+        }
     }
 
     @Override
@@ -789,27 +884,23 @@ public abstract class AbstractImagineBreaker implements ImagineBreaker {
 
         static void set(Object base, long offset, Class<?> type, Object value) {
             if (type == boolean.class) {
-                setBoolean(base, offset, ((Boolean) value).booleanValue());
+                setBoolean(base, offset, (Boolean) value);
             } else if (type == byte.class) {
-                setByte(base, offset, ((Byte) value).byteValue());
+                setByte(base, offset, (Byte) value);
             } else if (type == short.class) {
-                setShort(base, offset, ((Short) value).shortValue());
+                setShort(base, offset, (Short) value);
             } else if (type == char.class) {
-                setChar(base, offset, ((Character) value).charValue());
+                setChar(base, offset, (Character) value);
             } else if (type == int.class) {
-                setInt(base, offset, ((Integer) value).intValue());
+                setInt(base, offset, (Integer) value);
             } else if (type == long.class) {
-                setLong(base, offset, ((Long) value).longValue());
+                setLong(base, offset, (Long) value);
             } else if (type == float.class) {
-                setFloat(base, offset, ((Float) value).floatValue());
+                setFloat(base, offset, (Float) value);
             } else if (type == double.class) {
-                setDouble(base, offset, ((Double) value).doubleValue());
+                setDouble(base, offset, (Double) value);
             } else {
-                try {
-                    iu$putReference.invokeExact(base, offset, value);
-                } catch (Throwable t) {
-                    throw rethrow(t);
-                }
+                throw new IllegalArgumentException("Not a primitive type: " + type.getName());
             }
         }
 
@@ -1010,6 +1101,7 @@ public abstract class AbstractImagineBreaker implements ImagineBreaker {
         }
 
         static void clearEnumCache(Class<?> type) {
+            checkEnumType(type);
             if (ENUM_VARS >= 0L) {
                 Holder.putReference(type, ENUM_VARS, null);
                 return;

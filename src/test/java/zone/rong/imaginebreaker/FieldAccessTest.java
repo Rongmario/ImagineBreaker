@@ -85,6 +85,42 @@ public class FieldAccessTest {
     }
 
     @Test
+    public void primitiveAccessRejectsWideningConversions() {
+        ImagineBreaker ib = Index.get();
+        Box box = new Box();
+        box.b = 3;
+        box.n = 4;
+
+        Field b = ib.declaredField(Box.class, "b");
+        Field n = ib.declaredField(Box.class, "n");
+        Field l = ib.declaredField(Box.class, "l");
+        Field d = ib.declaredField(Box.class, "d");
+
+        Assertions.assertThrows(IllegalArgumentException.class, () -> ib.getInt(box, b));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> ib.getLong(box, n));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> ib.setByte(box, n, (byte) 5));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> ib.set(box, l, Integer.valueOf(6)));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> ib.setFloat(box, d, 7.5F));
+    }
+
+    @Test
+    public void invalidFieldAccessThrowsBeforeUsingUnsafe() {
+        ImagineBreaker ib = Index.get();
+        Box box = new Box();
+        Field n = ib.declaredField(Box.class, "n");
+        Field label = ib.declaredField(Box.class, "label");
+
+        Assertions.assertThrows(NullPointerException.class, () -> ib.get(null, n));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> ib.get(new Object(), n));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> ib.getBoolean(box, n));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> ib.getInt(box, label));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> ib.setInt(box, label, 1));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> ib.set(box, n, null));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> ib.set(box, n, "not an int"));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> ib.set(box, label, new Object()));
+    }
+
+    @Test
     public void copyInstanceField() {
         ImagineBreaker ib = Index.get();
         Box from = new Box();

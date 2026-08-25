@@ -311,6 +311,78 @@ public interface ImagineBreaker {
     Object get(@Nullable Object instance, Field field);
 
     /**
+     * Boolean field value. {@code instance} is ignored for static fields.
+     *
+     * @param instance instance, or {@code null} if static
+     * @param field boolean field
+     * @return field value
+     */
+    boolean getBoolean(@Nullable Object instance, Field field);
+
+    /**
+     * Byte field value. {@code instance} is ignored for static fields.
+     *
+     * @param instance instance, or {@code null} if static
+     * @param field byte field
+     * @return field value
+     */
+    byte getByte(@Nullable Object instance, Field field);
+
+    /**
+     * Short field value. {@code instance} is ignored for static fields.
+     *
+     * @param instance instance, or {@code null} if static
+     * @param field short field
+     * @return field value
+     */
+    short getShort(@Nullable Object instance, Field field);
+
+    /**
+     * Character field value. {@code instance} is ignored for static fields.
+     *
+     * @param instance instance, or {@code null} if static
+     * @param field character field
+     * @return field value
+     */
+    char getChar(@Nullable Object instance, Field field);
+
+    /**
+     * Integer field value. {@code instance} is ignored for static fields.
+     *
+     * @param instance instance, or {@code null} if static
+     * @param field integer field
+     * @return field value
+     */
+    int getInt(@Nullable Object instance, Field field);
+
+    /**
+     * Long field value. {@code instance} is ignored for static fields.
+     *
+     * @param instance instance, or {@code null} if static
+     * @param field long field
+     * @return field value
+     */
+    long getLong(@Nullable Object instance, Field field);
+
+    /**
+     * Float field value. {@code instance} is ignored for static fields.
+     *
+     * @param instance instance, or {@code null} if static
+     * @param field float field
+     * @return field value
+     */
+    float getFloat(@Nullable Object instance, Field field);
+
+    /**
+     * Double field value. {@code instance} is ignored for static fields.
+     *
+     * @param instance instance, or {@code null} if static
+     * @param field double field
+     * @return field value
+     */
+    double getDouble(@Nullable Object instance, Field field);
+
+    /**
      * Field value. {@code instance} is ignored for static fields.
      * Goes through {@code Unsafe}; static {@code final} fields are writable.
      *
@@ -319,6 +391,78 @@ public interface ImagineBreaker {
      * @param value boxed value
      */
     void set(@Nullable Object instance, Field field, Object value);
+
+    /**
+     * Sets a boolean field. {@code instance} is ignored for static fields.
+     *
+     * @param instance instance, or {@code null} if static
+     * @param field boolean field
+     * @param value field value
+     */
+    void setBoolean(@Nullable Object instance, Field field, boolean value);
+
+    /**
+     * Sets a byte field. {@code instance} is ignored for static fields.
+     *
+     * @param instance instance, or {@code null} if static
+     * @param field byte field
+     * @param value field value
+     */
+    void setByte(@Nullable Object instance, Field field, byte value);
+
+    /**
+     * Sets a short field. {@code instance} is ignored for static fields.
+     *
+     * @param instance instance, or {@code null} if static
+     * @param field short field
+     * @param value field value
+     */
+    void setShort(@Nullable Object instance, Field field, short value);
+
+    /**
+     * Sets a character field. {@code instance} is ignored for static fields.
+     *
+     * @param instance instance, or {@code null} if static
+     * @param field character field
+     * @param value field value
+     */
+    void setChar(@Nullable Object instance, Field field, char value);
+
+    /**
+     * Sets an integer field. {@code instance} is ignored for static fields.
+     *
+     * @param instance instance, or {@code null} if static
+     * @param field integer field
+     * @param value field value
+     */
+    void setInt(@Nullable Object instance, Field field, int value);
+
+    /**
+     * Sets a long field. {@code instance} is ignored for static fields.
+     *
+     * @param instance instance, or {@code null} if static
+     * @param field long field
+     * @param value field value
+     */
+    void setLong(@Nullable Object instance, Field field, long value);
+
+    /**
+     * Sets a float field. {@code instance} is ignored for static fields.
+     *
+     * @param instance instance, or {@code null} if static
+     * @param field float field
+     * @param value field value
+     */
+    void setFloat(@Nullable Object instance, Field field, float value);
+
+    /**
+     * Sets a double field. {@code instance} is ignored for static fields.
+     *
+     * @param instance instance, or {@code null} if static
+     * @param field double field
+     * @param value field value
+     */
+    void setDouble(@Nullable Object instance, Field field, double value);
 
     /**
      * Copies {@code field} from {@code from} to {@code to}.

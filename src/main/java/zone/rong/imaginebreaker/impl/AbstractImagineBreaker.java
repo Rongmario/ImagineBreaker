@@ -193,30 +193,96 @@ public abstract class AbstractImagineBreaker implements ImagineBreaker {
 
     @Override
     public Object get(Object instance, Field field) {
-        Object base;
-        long offset;
-        if (Modifier.isStatic(field.getModifiers())) {
-            base = Holder.staticBase(field);
-            offset = Holder.staticOffset(field);
-        } else {
-            base = instance;
-            offset = Holder.objectOffset(field);
-        }
-        return Holder.get(base, offset, field.getType());
+        return Holder.get(fieldBase(instance, field), fieldOffset(field), field.getType());
+    }
+
+    @Override
+    public boolean getBoolean(Object instance, Field field) {
+        return Holder.getBoolean(fieldBase(instance, field), fieldOffset(field));
+    }
+
+    @Override
+    public byte getByte(Object instance, Field field) {
+        return Holder.getByte(fieldBase(instance, field), fieldOffset(field));
+    }
+
+    @Override
+    public short getShort(Object instance, Field field) {
+        return Holder.getShort(fieldBase(instance, field), fieldOffset(field));
+    }
+
+    @Override
+    public char getChar(Object instance, Field field) {
+        return Holder.getChar(fieldBase(instance, field), fieldOffset(field));
+    }
+
+    @Override
+    public int getInt(Object instance, Field field) {
+        return Holder.getInt(fieldBase(instance, field), fieldOffset(field));
+    }
+
+    @Override
+    public long getLong(Object instance, Field field) {
+        return Holder.getLong(fieldBase(instance, field), fieldOffset(field));
+    }
+
+    @Override
+    public float getFloat(Object instance, Field field) {
+        return Holder.getFloat(fieldBase(instance, field), fieldOffset(field));
+    }
+
+    @Override
+    public double getDouble(Object instance, Field field) {
+        return Holder.getDouble(fieldBase(instance, field), fieldOffset(field));
     }
 
     @Override
     public void set(Object instance, Field field, Object value) {
-        Object base;
-        long offset;
-        if (Modifier.isStatic(field.getModifiers())) {
-            base = Holder.staticBase(field);
-            offset = Holder.staticOffset(field);
-        } else {
-            base = instance;
-            offset = Holder.objectOffset(field);
-        }
-        Holder.set(base, offset, field.getType(), value);
+        Holder.set(fieldBase(instance, field), fieldOffset(field), field.getType(), value);
+    }
+
+    @Override
+    public void setBoolean(Object instance, Field field, boolean value) {
+        Holder.setBoolean(fieldBase(instance, field), fieldOffset(field), value);
+    }
+
+    @Override
+    public void setByte(Object instance, Field field, byte value) {
+        Holder.setByte(fieldBase(instance, field), fieldOffset(field), value);
+    }
+
+    @Override
+    public void setShort(Object instance, Field field, short value) {
+        Holder.setShort(fieldBase(instance, field), fieldOffset(field), value);
+    }
+
+    @Override
+    public void setChar(Object instance, Field field, char value) {
+        Holder.setChar(fieldBase(instance, field), fieldOffset(field), value);
+    }
+
+    @Override
+    public void setInt(Object instance, Field field, int value) {
+        Holder.setInt(fieldBase(instance, field), fieldOffset(field), value);
+    }
+
+    @Override
+    public void setLong(Object instance, Field field, long value) {
+        Holder.setLong(fieldBase(instance, field), fieldOffset(field), value);
+    }
+
+    @Override
+    public void setFloat(Object instance, Field field, float value) {
+        Holder.setFloat(fieldBase(instance, field), fieldOffset(field), value);
+    }
+
+    @Override
+    public void setDouble(Object instance, Field field, double value) {
+        Holder.setDouble(fieldBase(instance, field), fieldOffset(field), value);
+    }
+
+    private Object fieldBase(Object instance, Field field) {
+        return Modifier.isStatic(field.getModifiers()) ? Holder.staticBase(field) : instance;
     }
 
     @Override
@@ -626,58 +692,186 @@ public abstract class AbstractImagineBreaker implements ImagineBreaker {
         }
 
         static Object get(Object base, long offset, Class<?> type) {
+            if (type == boolean.class) {
+                return getBoolean(base, offset);
+            }
+            if (type == byte.class) {
+                return getByte(base, offset);
+            }
+            if (type == short.class) {
+                return getShort(base, offset);
+            }
+            if (type == char.class) {
+                return getChar(base, offset);
+            }
+            if (type == int.class) {
+                return getInt(base, offset);
+            }
+            if (type == long.class) {
+                return getLong(base, offset);
+            }
+            if (type == float.class) {
+                return getFloat(base, offset);
+            }
+            if (type == double.class) {
+                return getDouble(base, offset);
+            }
             try {
-                if (type == boolean.class) {
-                    return (boolean) iu$getBoolean.invokeExact(base, offset);
-                }
-                if (type == byte.class) {
-                    return (byte) iu$getByte.invokeExact(base, offset);
-                }
-                if (type == short.class) {
-                    return (short) iu$getShort.invokeExact(base, offset);
-                }
-                if (type == char.class) {
-                    return (char) iu$getChar.invokeExact(base, offset);
-                }
-                if (type == int.class) {
-                    return (int) iu$getInt.invokeExact(base, offset);
-                }
-                if (type == long.class) {
-                    return (long) iu$getLong.invokeExact(base, offset);
-                }
-                if (type == float.class) {
-                    return (float) iu$getFloat.invokeExact(base, offset);
-                }
-                if (type == double.class) {
-                    return (double) iu$getDouble.invokeExact(base, offset);
-                }
                 return iu$getReference.invokeExact(base, offset);
             } catch (Throwable t) {
                 throw rethrow(t);
             }
         }
 
-        static void set(Object base, long offset, Class<?> type, Object value) {
+        static boolean getBoolean(Object base, long offset) {
             try {
-                if (type == boolean.class) {
-                    iu$putBoolean.invokeExact(base, offset, ((Boolean) value).booleanValue());
-                } else if (type == byte.class) {
-                    iu$putByte.invokeExact(base, offset, ((Byte) value).byteValue());
-                } else if (type == short.class) {
-                    iu$putShort.invokeExact(base, offset, ((Short) value).shortValue());
-                } else if (type == char.class) {
-                    iu$putChar.invokeExact(base, offset, ((Character) value).charValue());
-                } else if (type == int.class) {
-                    iu$putInt.invokeExact(base, offset, ((Integer) value).intValue());
-                } else if (type == long.class) {
-                    iu$putLong.invokeExact(base, offset, ((Long) value).longValue());
-                } else if (type == float.class) {
-                    iu$putFloat.invokeExact(base, offset, ((Float) value).floatValue());
-                } else if (type == double.class) {
-                    iu$putDouble.invokeExact(base, offset, ((Double) value).doubleValue());
-                } else {
+                return (boolean) iu$getBoolean.invokeExact(base, offset);
+            } catch (Throwable t) {
+                throw rethrow(t);
+            }
+        }
+
+        static byte getByte(Object base, long offset) {
+            try {
+                return (byte) iu$getByte.invokeExact(base, offset);
+            } catch (Throwable t) {
+                throw rethrow(t);
+            }
+        }
+
+        static short getShort(Object base, long offset) {
+            try {
+                return (short) iu$getShort.invokeExact(base, offset);
+            } catch (Throwable t) {
+                throw rethrow(t);
+            }
+        }
+
+        static char getChar(Object base, long offset) {
+            try {
+                return (char) iu$getChar.invokeExact(base, offset);
+            } catch (Throwable t) {
+                throw rethrow(t);
+            }
+        }
+
+        static int getInt(Object base, long offset) {
+            try {
+                return (int) iu$getInt.invokeExact(base, offset);
+            } catch (Throwable t) {
+                throw rethrow(t);
+            }
+        }
+
+        static long getLong(Object base, long offset) {
+            try {
+                return (long) iu$getLong.invokeExact(base, offset);
+            } catch (Throwable t) {
+                throw rethrow(t);
+            }
+        }
+
+        static float getFloat(Object base, long offset) {
+            try {
+                return (float) iu$getFloat.invokeExact(base, offset);
+            } catch (Throwable t) {
+                throw rethrow(t);
+            }
+        }
+
+        static double getDouble(Object base, long offset) {
+            try {
+                return (double) iu$getDouble.invokeExact(base, offset);
+            } catch (Throwable t) {
+                throw rethrow(t);
+            }
+        }
+
+        static void set(Object base, long offset, Class<?> type, Object value) {
+            if (type == boolean.class) {
+                setBoolean(base, offset, ((Boolean) value).booleanValue());
+            } else if (type == byte.class) {
+                setByte(base, offset, ((Byte) value).byteValue());
+            } else if (type == short.class) {
+                setShort(base, offset, ((Short) value).shortValue());
+            } else if (type == char.class) {
+                setChar(base, offset, ((Character) value).charValue());
+            } else if (type == int.class) {
+                setInt(base, offset, ((Integer) value).intValue());
+            } else if (type == long.class) {
+                setLong(base, offset, ((Long) value).longValue());
+            } else if (type == float.class) {
+                setFloat(base, offset, ((Float) value).floatValue());
+            } else if (type == double.class) {
+                setDouble(base, offset, ((Double) value).doubleValue());
+            } else {
+                try {
                     iu$putReference.invokeExact(base, offset, value);
+                } catch (Throwable t) {
+                    throw rethrow(t);
                 }
+            }
+        }
+
+        static void setBoolean(Object base, long offset, boolean value) {
+            try {
+                iu$putBoolean.invokeExact(base, offset, value);
+            } catch (Throwable t) {
+                throw rethrow(t);
+            }
+        }
+
+        static void setByte(Object base, long offset, byte value) {
+            try {
+                iu$putByte.invokeExact(base, offset, value);
+            } catch (Throwable t) {
+                throw rethrow(t);
+            }
+        }
+
+        static void setShort(Object base, long offset, short value) {
+            try {
+                iu$putShort.invokeExact(base, offset, value);
+            } catch (Throwable t) {
+                throw rethrow(t);
+            }
+        }
+
+        static void setChar(Object base, long offset, char value) {
+            try {
+                iu$putChar.invokeExact(base, offset, value);
+            } catch (Throwable t) {
+                throw rethrow(t);
+            }
+        }
+
+        static void setInt(Object base, long offset, int value) {
+            try {
+                iu$putInt.invokeExact(base, offset, value);
+            } catch (Throwable t) {
+                throw rethrow(t);
+            }
+        }
+
+        static void setLong(Object base, long offset, long value) {
+            try {
+                iu$putLong.invokeExact(base, offset, value);
+            } catch (Throwable t) {
+                throw rethrow(t);
+            }
+        }
+
+        static void setFloat(Object base, long offset, float value) {
+            try {
+                iu$putFloat.invokeExact(base, offset, value);
+            } catch (Throwable t) {
+                throw rethrow(t);
+            }
+        }
+
+        static void setDouble(Object base, long offset, double value) {
+            try {
+                iu$putDouble.invokeExact(base, offset, value);
             } catch (Throwable t) {
                 throw rethrow(t);
             }

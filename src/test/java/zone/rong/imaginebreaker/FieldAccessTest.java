@@ -35,6 +35,56 @@ public class FieldAccessTest {
     }
 
     @Test
+    public void getAndSetPrimitiveFields() {
+        ImagineBreaker ib = Index.get();
+        Box box = new Box();
+        box.flag = true;
+        box.b = 1;
+        box.s = 2;
+        box.c = 'a';
+        box.n = 3;
+        box.l = 4L;
+        box.f = 5.5F;
+        box.d = 6.5D;
+
+        Field flag = ib.declaredField(Box.class, "flag");
+        Field b = ib.declaredField(Box.class, "b");
+        Field s = ib.declaredField(Box.class, "s");
+        Field c = ib.declaredField(Box.class, "c");
+        Field n = ib.declaredField(Box.class, "n");
+        Field l = ib.declaredField(Box.class, "l");
+        Field f = ib.declaredField(Box.class, "f");
+        Field d = ib.declaredField(Box.class, "d");
+
+        Assertions.assertTrue(ib.getBoolean(box, flag));
+        Assertions.assertEquals((byte) 1, ib.getByte(box, b));
+        Assertions.assertEquals((short) 2, ib.getShort(box, s));
+        Assertions.assertEquals('a', ib.getChar(box, c));
+        Assertions.assertEquals(3, ib.getInt(box, n));
+        Assertions.assertEquals(4L, ib.getLong(box, l));
+        Assertions.assertEquals(5.5F, ib.getFloat(box, f));
+        Assertions.assertEquals(6.5D, ib.getDouble(box, d));
+
+        ib.setBoolean(box, flag, false);
+        ib.setByte(box, b, (byte) 11);
+        ib.setShort(box, s, (short) 12);
+        ib.setChar(box, c, 'z');
+        ib.setInt(box, n, 13);
+        ib.setLong(box, l, 14L);
+        ib.setFloat(box, f, 15.5F);
+        ib.setDouble(box, d, 16.5D);
+
+        Assertions.assertFalse(box.flag);
+        Assertions.assertEquals((byte) 11, box.b);
+        Assertions.assertEquals((short) 12, box.s);
+        Assertions.assertEquals('z', box.c);
+        Assertions.assertEquals(13, box.n);
+        Assertions.assertEquals(14L, box.l);
+        Assertions.assertEquals(15.5F, box.f);
+        Assertions.assertEquals(16.5D, box.d);
+    }
+
+    @Test
     public void copyInstanceField() {
         ImagineBreaker ib = Index.get();
         Box from = new Box();
@@ -58,6 +108,19 @@ public class FieldAccessTest {
     }
 
     @Test
+    public void setStaticFinalPrimitive() {
+        ImagineBreaker ib = Index.get();
+        Field field = ib.declaredField(Box.class, "INT_CONST");
+        int previous = ib.getInt(null, field);
+        try {
+            ib.setInt(null, field, 42);
+            Assertions.assertEquals(42, ib.getInt(null, field));
+        } finally {
+            ib.setInt(null, field, previous);
+        }
+    }
+
+    @Test
     public void fieldOffsetMatchesUnsafe() {
         ImagineBreaker ib = Index.get();
         Field n = ib.declaredField(Box.class, "n");
@@ -69,8 +132,15 @@ public class FieldAccessTest {
     static final class Box {
 
         static final String CONST = "const";
+        static final int INT_CONST = 7;
         boolean flag;
+        byte b;
+        short s;
+        char c;
         int n;
+        long l;
+        float f;
+        double d;
         String label;
 
     }
